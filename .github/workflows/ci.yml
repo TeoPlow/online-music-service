@@ -45,4 +45,4 @@ jobs:
 
       - name: Run Go tests
         run: |
-          go test -v ./...
+          if [ -z "$(go list ./...)" ]; then echo "No tests found"; else go test -v ./...; fi
