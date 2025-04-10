@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Python setup and linting
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+
+      - name: Lint with Flake-8
+        run: |
+          flake8 .
+
+      - name: Run tests with pytest
+        run: |
+          if [ -z "$(find . -name '*.py' -o -name 'test_*.py')" ]; then echo "No tests found"; else pytest; fi
+
+      # Go setup and testing
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.23'
+      
+      # - name: Init Go module
+      #   run: |
+      #     go mod init github.com/TeoPlow/online-music-service || true
+      
+      - name: Install Go dependencies
+        run: |
+          go mod tidy
+
+      # - name: Install golangci-lint
+      #   run: |
+      #     curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+      
+      # - name: Run golangci-lint
+      #   run: |
+      #     $(go env GOPATH)/bin/golangci-lint run ./...
+      
+      - name: Run Go tests
+        run: |
+          if [ -z "$(go list ./...)" ]; then echo "No tests found"; else go test -v ./...; fi
