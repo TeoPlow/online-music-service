@@ -1,0 +1,63 @@
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    - govet              # стандартные проверки от go vet
+    - errcheck           # пропущенные проверки ошибок
+    - staticcheck        # множество анализов кода
+    - gosimple           # упрощение кода
+    - unused             # неиспользуемые переменные, функции и т.д.
+    - typecheck          # типовые ошибки
+    - depguard           # запрет импорта определённых пакетов
+    - gofmt              # стиль форматирования
+    - goimports          # порядок импортов
+    - revive             # лёгкий и гибкий линтер стиля
+    - ineffassign        # неэффективные присваивания
+    - nilerr             # nil вместо ошибки
+    - gocritic           # различные эвристики
+    - misspell           # орфография
+    - copyloopvar
+    - lll
+linters-settings:
+  gofmt:
+    simplify: true
+
+  revive:
+    severity: warning
+    rules:
+      - name: indent-error-flow
+      - name: var-naming
+      - name: package-comments
+      - name: if-return
+      - name: dot-imports
+
+  goimports:
+    local-prefixes: github.com/TeoPlow/online-music-service
+
+  misspell:
+    locale: RU    
+
+  lll:
+    line-length: 120
+    tab-width: 4
+    ignore-strings: true
+    ignore-comments: true
+
+issues:
+  exclude-use-default: false
+  exclude-dirs:
+    - "mocks"
+  exclude-files:
+    - ".*_mock.go"
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude:
+    - "should have comment or be unexported"  # ослабим комментарии на экспортируемые
+    - "error return value not checked"        # иногда нужно, но часто — шум
+
+output:
+  formats: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
