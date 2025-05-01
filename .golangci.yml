@@ -45,6 +45,47 @@ linters-settings:
     ignore-strings: true
     ignore-comments: true
 
+  depguard:
+    rules:
+      main:
+        list-mode: strict
+        files:
+          - "**/cmd/**"
+        allow:
+          - context
+          - flag
+          - log
+          - "github.com/TeoPlow/online-music-service"
+      musical-internal:
+        list-mode: strict
+        files:
+          - "**/musical/internal/**"
+        allow:
+          # std
+          - $gostd
+          - "github.com/google/uuid"
+          - "gopkg.in/yaml.v3"
+          # for http
+          - "github.com/gorilla/mux"
+          # for grpc
+          - "google.golang.org/grpc"
+          - "google.golang.org/protobuf/types/known"
+          # for postgres
+          - "github.com/jackc"
+          - "github.com/georgysavva/scany/pgxscan"
+          # internal packages
+          - "github.com/TeoPlow/online-music-service/src/musical/internal"
+          - "github.com/TeoPlow/online-music-service/src/musical/pkg"
+      other:
+        list-mode: strict
+        files:
+          - $all
+          - "!**/cmd/**"
+          - "!**/musical/**"
+        allow:
+          - $gostd
+    
+
 issues:
   exclude-use-default: false
   exclude-dirs:
@@ -56,6 +97,10 @@ issues:
   exclude:
     - "should have comment or be unexported"  # ослабим комментарии на экспортируемые
     - "error return value not checked"        # иногда нужно, но часто — шум
+  exclude-rules:
+    - path: "cmd/.*/main.go"
+      linters:
+        - revive
 
 output:
   formats: colored-line-number

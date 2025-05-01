@@ -16,6 +16,9 @@ go-deps:
 	go install github.com/pressly/goose/v3/cmd/goose@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install mvdan.cc/gofumpt@latest
+	go install github.com/golang/mock/mockgen@latest
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	go mod tidy
 
 .PHONY: go-fmt
@@ -24,7 +27,7 @@ go-fmt:
 
 .PHONY: go-test
 go-test:
-	@echo "Running Go linter..."
+	@echo "Running Go tests..."
 	@if [ -z "$$(find . -type f -name '*.go')" ]; then \
 		echo "No Go tests found."; \
 	else \
