@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package musical;
+
+option go_package = "github.com/TeoPlow/online-music-service/src/musical/pkg/musicalpb";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service MusicService {
+  rpc AddMusic(Track) returns (google.protobuf.Empty);
+  rpc GetMusic(IDRequest) returns (Track);
+}
+
+message Track {
+  string id = 1; // UUID
+  string title = 2;
+  string album_id = 3; // UUID
+  string genre = 4;
+  uint32 duration = 5;
+
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message IDRequest {
+  string id = 1; // UUID
+}
