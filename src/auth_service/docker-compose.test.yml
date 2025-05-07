@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - testnet
+
+  migrate:
+    build:
+      context: .
+      dockerfile: migrate/Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      DB_URL: postgres://testuser:testpass@postgres:5432/testdb?sslmode=disable
+      MIGRATIONS_DIR: ./migrations
+    networks:
+      - testnet
+
+  auth_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    networks:
+      - testnet
+    ports:
+      - "50051:50051"
+
+  e2e:
+    build:
+      context: .
+      dockerfile: test/e2e/Dockerfile
+
+    environment:
+      - GRPC_HOST=auth_service:50051
+    networks:
+      - testnet
+    command: ["go", "test", "-v", "./test/e2e"]
+
+volumes:
+  pgdata:
+
+networks:
+  testnet:
