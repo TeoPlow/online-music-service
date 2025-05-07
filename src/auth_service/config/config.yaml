@@ -1,11 +1,6 @@
 env: local
 
-database:
-  host: localhost
-  port: 5433
-  user: testuser
-  password: testpassword
-  name: testdb
+db_url: postgres://testuser:testpass@localhost:5433/testdb?sslmode=disable
   
 token_ttl: 1h
 
