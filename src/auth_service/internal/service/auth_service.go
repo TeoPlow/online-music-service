@@ -1,3 +1,4 @@
+// Package service реализует бизнес-логику сервиса авторизации.
 package service
 
 import (
@@ -6,10 +7,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/google/uuid"
 	"github.com/TeoPlow/online-music-service/src/auth_service/internal/domain"
 	"github.com/TeoPlow/online-music-service/src/auth_service/internal/lib/jwt"
 	"github.com/TeoPlow/online-music-service/src/auth_service/internal/repository/postgres"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -1,3 +1,4 @@
+// Package auth реализует gRPC-методы для аутентификации пользователей.
 package auth
 
 import (

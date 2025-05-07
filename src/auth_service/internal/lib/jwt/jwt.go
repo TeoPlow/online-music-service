@@ -1,3 +1,4 @@
+// Package jwt предоставляет функции для генерации и валидации JWT токенов.
 package jwt
 
 import (

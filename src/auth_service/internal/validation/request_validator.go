@@ -1,3 +1,4 @@
+// Package validation содержит функции валидации входящих gRPC-запросов.
 package validation
 
 import (

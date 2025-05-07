@@ -1,3 +1,4 @@
+// Package storage отвечает за подключение к базе данных и предоставление пула соединений.
 package storage
 
 import (

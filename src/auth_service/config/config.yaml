@@ -1,12 +1,12 @@
 env: local
 
-db:
-  host: postgres
-  port: 5432
+database:
+  host: localhost
+  port: 5433
   user: testuser
-  password: testpass
+  password: testpassword
   name: testdb
-
+  
 token_ttl: 1h
 
 grpc_server:

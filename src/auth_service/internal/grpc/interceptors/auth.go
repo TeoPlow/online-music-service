@@ -1,3 +1,4 @@
+// Package interceptors содержит middleware для gRPC-сервера, включая аутентификацию и логирование.
 package interceptors
 
 import (

@@ -1,3 +1,4 @@
+// Package grpcapp инициализирует и запускает gRPC-сервер.
 package grpcapp
 
 import (

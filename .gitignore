@@ -3,3 +3,7 @@
 .vscode/
 
 bin/
+
+.env
+
+.src/auth_service/internal/grpc/auth_test/
