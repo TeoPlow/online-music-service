@@ -90,33 +90,33 @@ linters-settings:
           allow:
             # std
             - $gostd
-            - github.com/google/uuid
-            - github.com/zhavkk/Auth-protobuf/gen/go/auth
-            - github.com/golang-jwt/jwt/v5
-            - github.com/jackc/pgx/v5
-            - github.com/jackc/pgx/v5/pgxpool
-            - github.com/georgysavva/scany/pgxscan
-            - github.com/stretchr/testify/assert
-            - github.com/stretchr/testify/require
-            - github.com/joho/godotenv
-            - github.com/ilyakaznacheev/cleanenv
-            - golang.org/x/crypto/bcrypt
-            - go.uber.org/mock/gomock
-            - google.golang.org/grpc
-            - google.golang.org/grpc/codes
-            - google.golang.org/grpc/status
-            - google.golang.org/grpc/metadata
-            - google.golang.org/grpc/credentials/insecure
-            - google.golang.org/grpc/test/bufconn
-            - github.com/TeoPlow/online-music-service/auth_service/internal
-            - github.com/TeoPlow/online-music-service/auth_service/internal/logger
-            - github.com/TeoPlow/online-music-service/auth_service/internal/pkg/jwt
-            - github.com/TeoPlow/online-music-service/auth_service/internal/repository
-            - github.com/TeoPlow/online-music-service/auth_service/internal/service
-            - github.com/TeoPlow/online-music-service/auth_service/internal/storage
-            - github.com/TeoPlow/online-music-service/auth_service/internal/validation
-            - github.com/TeoPlow/online-music-service/auth_service/pkg
-            - github.com/TeoPlow/online-music-service/auth_service/internal/models      
+            - "github.com/google/uuid"
+            - "github.com/zhavkk/Auth-protobuf/gen/go/auth"
+            - "github.com/golang-jwt/jwt/v5"
+            - "github.com/jackc/pgx/v5"
+            - "github.com/jackc/pgx/v5/pgxpool"
+            - "github.com/georgysavva/scany/pgxscan"
+            - "github.com/stretchr/testify/assert"
+            - "github.com/stretchr/testify/require"
+            - "github.com/joho/godotenv"
+            - "github.com/ilyakaznacheev/cleanenv"
+            - "golang.org/x/crypto/bcrypt"
+            - "go.uber.org/mock/gomock"
+            - "google.golang.org/grpc"
+            - "google.golang.org/grpc/codes"
+            - "google.golang.org/grpc/status"
+            - "google.golang.org/grpc/metadata"
+            - "google.golang.org/grpc/credentials/insecure"
+            - "google.golang.org/grpc/test/bufconn"
+            - "github.com/TeoPlow/online-music-service/auth_service/internal"
+            - "github.com/TeoPlow/online-music-service/auth_service/internal/logger"
+            - "github.com/TeoPlow/online-music-service/auth_service/internal/pkg/jwt"
+            - "github.com/TeoPlow/online-music-service/auth_service/internal/repository"
+            - "github.com/TeoPlow/online-music-service/auth_service/internal/service"
+            - "github.com/TeoPlow/online-music-service/auth_service/internal/storage"
+            - "github.com/TeoPlow/online-music-service/auth_service/internal/validation"
+            - "github.com/TeoPlow/online-music-service/auth_service/pkg"
+            - "github.com/TeoPlow/online-music-service/auth_service/internal/models"
       other:
         list-mode: strict
         files:
