@@ -53,6 +53,13 @@ py-fmt:
 .PHONY: py-test
 py-test:
 	@echo "Running Python tests..."
+	@echo "Starting docker-compose for test dependencies..."
+	@docker-compose -f src/analysis/tests/docker-compose.test.yml up -d
+	@echo "Waiting for ClickHouse to be ready..."
+	@for i in 1 2 3 4 5; do \
+		nc -z localhost 9000 && echo "ClickHouse is up!" && break || \
+		(echo "Waiting..."; sleep 2); \
+	done
 	@if [ -z "$$(find . -type f -name 'test_*.py' -o -name '*_test.py')" ]; then \
 		echo "No Python tests found."; \
 	else \
