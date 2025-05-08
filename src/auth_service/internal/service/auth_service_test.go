@@ -12,10 +12,10 @@ import (
 	"go.uber.org/mock/gomock"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/logger"
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/models"
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/pkg/jwt"
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/repository/mocks"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/logger"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/models"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/pkg/jwt"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/repository/mocks"
 )
 
 func TestAuthService_Register(t *testing.T) {

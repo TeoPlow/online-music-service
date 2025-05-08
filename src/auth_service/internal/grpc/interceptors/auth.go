@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/pkg/jwt"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/pkg/jwt"
 )
 
 type AuthInterceptor struct {

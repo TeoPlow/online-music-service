@@ -15,7 +15,7 @@ import (
 
 	gomock "go.uber.org/mock/gomock"
 
-	models "github.com/TeoPlow/online-music-service/src/auth_service/internal/models"
+	models "github.com/TeoPlow/online-music-service/auth_service/internal/models"
 )
 
 // MockUserRepository is a mock of UserRepository interface.

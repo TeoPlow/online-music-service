@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/config"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/config"
 )
 
 type Storage struct {

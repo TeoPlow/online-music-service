@@ -10,10 +10,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/config"
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/logger"
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/models"
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/storage"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/config"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/logger"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/models"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/storage"
 )
 
 func setupTestDB(t *testing.T) *pgxpool.Pool {

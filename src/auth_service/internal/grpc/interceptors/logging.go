@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/logger"
+	"github.com/TeoPlow/online-music-service/auth_service/internal/logger"
 )
 
 type LoggingInterceptor struct {
