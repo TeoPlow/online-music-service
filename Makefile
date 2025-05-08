@@ -44,6 +44,7 @@ py-lint:
 py-deps:
 	$(PYENV) pip install --upgrade pip
 	$(PYENV) pip install flake8 pytest black
+	$(PYENV) pip install -r requirements.txt
 
 .PHONY: py-fmt
 py-fmt:
