@@ -39,6 +39,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install Docker Compose
+        run: sudo apt-get update && sudo apt-get install -y docker-compose
+
       - name: Install Python deps
         run: make py-deps
 
