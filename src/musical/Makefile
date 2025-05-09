@@ -16,7 +16,9 @@ run: build
 # Docker
 .PHONY: compose-up
 compose-up:
-	@docker compose -f $(COMPOSE_PATH) up -d 
+	@docker compose -f $(COMPOSE_PATH) up -d
+	@docker compose -f $(COMPOSE_PATH) exec -T postgres bash -c \
+		'until pg_isready -U user -d music; do sleep 1; done'
 
 .PHONY: compose-down
 compose-down:
@@ -37,3 +39,11 @@ gen-pb:
 	@protoc --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative \
 		    --go_out=pkg/musicalpb --go-grpc_out=pkg/musicalpb \
 		    -I api api/musical.proto
+
+
+# for tests
+.PHONY: test-deps-up
+test-deps-up: compose-up migrate-up
+
+.PHONY: test-deps-down
+test-deps-down: compose-down
