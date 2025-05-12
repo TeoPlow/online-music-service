@@ -1,3 +1,4 @@
+SERVICES := musical # Сюда пишем название папки сервиса через пробел
 PYENV=python -m 
 
 
@@ -25,16 +26,6 @@ go-deps:
 go-fmt:
 	gofumpt -w .
 
-.PHONY: go-test
-go-test:
-	@echo "Running Go tests..."
-	@if [ -z "$$(find . -type f -name '*.go')" ]; then \
-		echo "No Go tests found."; \
-	else \
-		go test -v ./...; \
-	fi
-
-
 # Python tasks
 .PHONY: py-lint
 py-lint:
@@ -50,21 +41,6 @@ py-deps:
 py-fmt:
 	$(PYENV) black . --exclude .venv
 
-.PHONY: py-test
-py-test:
-	@echo "Running Python tests..."
-	@echo "Starting docker-compose for test dependencies..."
-	docker-compose -f src/analysis/tests/docker-compose.test.yml up -d
-	@echo "Waiting for ClickHouse to be ready..."
-	@for i in 1 2 3 4 5 6 7 8 9 10; do \
-		curl -s "http://localhost:8123/?query=SELECT%201" && break || sleep 2; \
-	done
-	@if [ -z "$$(find . -type f -name 'test_*.py' -o -name '*_test.py')" ]; then \
-		echo "No Python tests found."; \
-	else \
-		pytest; \
-	fi
-
 # Common tasks
 .PHONY: lint
 lint: go-lint py-lint
@@ -76,4 +52,74 @@ deps: go-deps py-deps
 fmt: go-fmt py-fmt
 
 .PHONY: test
-test: go-test py-test
+test:
+	@if [ -n "$(SERVICE)" ]; then \
+		echo "Running tests only for $(SERVICE)..."; \
+		echo "=> Starting dependencies for $(SERVICE)..."; \
+		cd ./src/$(SERVICE) && $(MAKE) test-deps-up; \
+		cd - > /dev/null; \
+		echo "=> Running Go tests..."; \
+		if find ./src/$(SERVICE) -type f -name '*.go' | grep -q .; then \
+			go test -v ./src/$(SERVICE)/...; \
+		else \
+			echo "No Go files found in ./src/$(SERVICE)."; \
+		fi; \
+		echo "=> Running Python tests..."; \
+		if find ./src/$(SERVICE) -type f -name '*_test.py' | grep -q .; then \
+			pytest ./src/$(SERVICE); \
+		else \
+			echo "No Python tests found in ./src/$(SERVICE)."; \
+		fi; \
+		echo "=> Stopping dependencies..."; \
+		cd ./src/$(SERVICE) && $(MAKE) test-deps-down; \
+		cd - > /dev/null; \
+	else \
+		echo "Running tests for all services..."; \
+		for service in $(SERVICES); do \
+			echo "=> Starting dependencies for $$service..."; \
+			cd ./src/$$service && $(MAKE) test-deps-up; \
+			cd - > /dev/null; \
+			echo "=> Running Go tests for $$service..."; \
+			if find ./src/$$service -type f -name '*.go' | grep -q .; then \
+				go test -v ./src/$$service/...; \
+			else \
+				echo "No Go files found in ./src/$$service."; \
+			fi; \
+			echo "=> Running Python tests for $$service..."; \
+			if find ./src/$$service -type f -name '*_test.py' | grep -q .; then \
+				pytest ./src/$$service; \
+			else \
+				echo "No Python tests found in ./src/$$service."; \
+			fi; \
+			echo "=> Stopping dependencies for $$service..."; \
+			cd ./src/$$service && $(MAKE) test-deps-down; \
+			cd - > /dev/null; \
+		done; \
+	fi
+
+.PHONY: help
+help:
+	@echo "Available make targets:"
+	@echo
+	@echo "  help          Show this help message"
+	@echo
+	@echo "Go tasks:"
+	@echo "  go-lint       Run Go linter (golangci-lint)"
+	@echo "  go-deps       Install Go dependencies (linters, tools, etc.)"
+	@echo "  go-fmt        Format Go code using gofumpt"
+	@echo
+	@echo "Python tasks:"
+	@echo "  py-lint       Run Python linter (flake8)"
+	@echo "  py-deps       Install Python development dependencies"
+	@echo "  py-fmt        Format Python code using black"
+	@echo
+	@echo "Common tasks:"
+	@echo "  lint          Run both Go and Python linters"
+	@echo "  deps          Install both Go and Python dependencies"
+	@echo "  fmt           Format both Go and Python code"
+	@echo
+	@echo "Test tasks:"
+	@echo "  test          Run tests for all services or a specific one"
+	@echo "                Usage: make test SERVICE=<service-name>"
+	@echo "                It is required that the commands 'make test-deps-up'"
+	@echo "                and 'make test-deps-down' are executed inside the service folder"

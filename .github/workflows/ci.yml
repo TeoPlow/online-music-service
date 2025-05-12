@@ -26,28 +26,6 @@ jobs:
       - name: Run flake8
         run: make py-lint
 
-  python-test:
-    name: Python Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.12'
-
-      - name: Install Docker Compose
-        run: sudo apt-get update && sudo apt-get install -y docker-compose
-
-      - name: Install Python deps
-        run: make py-deps
-
-      - name: Run pytest
-        run: make py-test
-
   go-lint:
     name: Go Linter
     runs-on: ubuntu-latest
@@ -68,24 +46,30 @@ jobs:
 
       - name: Run golangci-lint
         run: make go-lint
-
-  go-test:
-    name: Go Tests
+    
+  tests:
+    name: All Tests
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+      
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
           go-version: '1.24'
 
-      - name: Tidy modules and install tools
-        run: |
-          go mod tidy
-          make go-deps
+      - name: Install Docker Compose
+        run: sudo apt-get update && sudo apt-get install -y docker-compose
+          
+      - name: Install dependencies
+        run: make deps
 
-      - name: Run go test
-        run: make go-test
+      - name: Run tests
+        run: make test
