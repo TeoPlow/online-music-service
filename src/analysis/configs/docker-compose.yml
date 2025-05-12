@@ -29,11 +29,9 @@ services:
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: mysecurepassword
     volumes:
-      - ./clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../migrations/clickhouse:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8123/ping"]
       interval: 5s
       timeout: 3s
       retries: 10
-
-

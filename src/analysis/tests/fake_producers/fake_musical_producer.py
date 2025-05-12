@@ -5,12 +5,13 @@ from datetime import datetime
 from kafka import KafkaProducer
 import json
 from faker import Faker
+import os
 
-from src.analysis.configs.config import (
+from configs.config import (
     kafka_bootstrap_servers,
 )
 
-from src.analysis.utils.logger_config import configure
+from utils.logger_config import configure
 import logging
 log = logging.getLogger('analysisLogger')
 configure()
@@ -24,8 +25,13 @@ producer = KafkaProducer(
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 
-with open('src/static/genres.json', 'r') as f:
-    genres = json.load(f)
+try:
+    with open('../static/genres.json', 'r') as f:
+        genres = json.load(f)
+
+except FileNotFoundError:
+    log.error(f"Файл {os.getcwd()}/../static/genres.json не найден.")
+    exit(1)
 
 artists = []
 albums = []

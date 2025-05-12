@@ -6,11 +6,11 @@ from kafka import KafkaProducer
 import json
 from faker import Faker
 
-from src.analysis.configs.config import (
+from configs.config import (
     kafka_bootstrap_servers,
 )
 
-from src.analysis.utils.logger_config import configure
+from utils.logger_config import configure
 import logging
 log = logging.getLogger('analysisLogger')
 configure()
@@ -26,11 +26,12 @@ producer = KafkaProducer(
 
 roles = ['user', 'admin', 'artist']
 
-with open('src/static/countries.json', 'r') as f:
+with open('../static/countries.json', 'r') as f:
     countries = json.load(f)
 
 
 def send_auth_user(num_iterations=1):
+    users = []
     for _ in range(num_iterations):
         user = {
             "id": str(uuid.uuid4()),
@@ -45,9 +46,11 @@ def send_auth_user(num_iterations=1):
         }
         producer.send('auth-users', user)
         log.debug(f"[auth-users] Kafka Sent: {user}")
+        users.append(user)
+    return users
 
 
 if __name__ == '__main__':
     while True:
-        send_auth_user()
+        _ = send_auth_user()
         time.sleep(random.randint(5, 10))

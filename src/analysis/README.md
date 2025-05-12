@@ -1,19 +1,48 @@
-# Запуск Analysis
-1. Создать `.venv`
-2. Прописать эту шнягу в терминал (если чёто не работает): 
-`export PYTHONPATH=path/to/online-music-service`
-3. Запустить ClickHouse, Kafka и Zookeeper
-4. Запустить скрипты лже-продюсеров - `fake_auth_producer.py` и `fake_music_producer.py`
-5. Запустить скрипт консьюмера - `transfromation_to_clickhouse.py`
+# Сервис сбора и анализа данных для онлайн музыкального сервиса
+
+## Описание
+
+Этот сервис предназначен для сбора и анализа данных из сервисов Аутентификации и Музыки. Данные в сервис поступают через Kafka, а далее преобразуются и сохраняются в базу данных ClickHouse для дальнейшего анализа. Он обрабатывает данные о пользователях, артистах, альбомах, треках и их взаимодействиях.
+
+## Запуск сервиса
+
+1. Установите нужные параметры в config.yml
+2. Перейдите в корневую папу сервиса ./analysis/ и запустите сервис с помощью команды:
+```
+make full-run
+```
+(В случае ошибок, попробуйте запустить ещё раз)
+
+По итогу, установится .venv, все зависимости, будут запущены ClickHouse, Zookeeper и Kafka, а также запустится основной Kafka Consumer, который будет обрабатывать входящие данные.
+
+## Проведение тестов
+
+1. Запустите все основные сервисы:
+```
+make full-run
+```
+
+2. В соседнем терминале запустите тесты:
+```
+make run-tests
+```
+
+Тесты за собой пока не подметают, поэтому они убираться за ними в БД будете вы сами :)
+
+## Остальные команды Makefile
+
+### Полезненько
+- `make clickhouse-shell` - вход в оболочку ClickHouse
+- `make remove-volumes` - удаление всех Docker-томов
+- `make stop-services` - остановка всех сервисов
+
+### Дополнительно
+- `make start-services` - запуск ClickHouse, Zookeeper и Kafka
+- `make setup-venv` - создание виртуального окружения и установка зависимостей
+- `make pythonpath` - установка PYTHONPATH
+- `make run-fake-auth-producer` - запуск фейкового продюсера для аутентификации пользователей
+- `make run-fake-musical-producer` - запуск фейкового продюсера для музыкальных данных
+- `make run-consumer` - запуск консьюмера, который преобразует данные из Kafka в ClickHouse
 
 
-# Запуск ClickHouse, Kafka и Zookeeper для тестирования
-`docker-compose -f src/analysis/tests/docker-compose.test.yml up -d`
 
-
-### Тут можно делать команды в ClickHouse (например, чекнуть БД)
-`docker exec -it clickhouse-server clickhouse-client`
-
-
-# Запуск тестов
-`pytest src/analysis/tests/`

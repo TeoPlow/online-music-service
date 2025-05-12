@@ -1,12 +1,27 @@
 import yaml  # type: ignore
+import os
 
-with open("src/analysis/configs/config.yml") as f:
-    config = yaml.safe_load(f)
 
+def get_base_dir():
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    return path
+
+
+config = {}
+
+try:
+    config_path = get_base_dir() + "/config.yml"
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
+except FileNotFoundError:
+    print("Config file not found on path:", config_path)
+
+# Пути
+BASE_DIR = config.get("paths", {}).get("base_dir", get_base_dir())
 
 # Логирование
-log_level = config.get("log", {}).get("level", "INFO").upper()
-save_to_file = config.get("log", {}).get("save_to_file", False)
+LOG_LEVEL = config.get("log", {}).get("level", "INFO").upper()
+SAVE_LOG_TO_FILE = config.get("log", {}).get("save_to_file", False)
 
 # Kafka
 kafka_bootstrap_servers = config.get("kafka", {}).get(
@@ -26,3 +41,7 @@ clickhouse_database = config.get("clickhouse", {}).get(
     "database",
     "music_streaming"
 )
+
+
+if __name__ == "__main__":
+    print(f"BASE_DIR: {BASE_DIR}")

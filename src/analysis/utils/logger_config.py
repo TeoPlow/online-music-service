@@ -3,7 +3,7 @@ import logging.config
 import sys
 import colorama  # type: ignore
 
-from src.analysis.configs.config import log_level, save_to_file
+from configs.config import LOG_LEVEL, SAVE_LOG_TO_FILE
 
 
 class ColoredFormatter(logging.Formatter):
@@ -37,7 +37,7 @@ def configure():
             "datefmt": "%Y-%m-%dT%H:%M:%S%Z"
         },
         "consoleFormatter": {
-            "class": "src.analysis.utils.logger_config"
+            "class": "utils.logger_config"
                      ".ColoredFormatter",
             "format": "(%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d - "
                       "%(message)s)",
@@ -60,22 +60,22 @@ def configure():
     }
 
     handlers = {"consoleHandler": console_handler}
-    if save_to_file:
+    if SAVE_LOG_TO_FILE:
         handlers["fileHandler"] = file_handler
 
     loggers = {
         "root": {
-            "level": log_level,
+            "level": LOG_LEVEL,
             "handlers": ["consoleHandler"]
         },
         "analysisLogger": {
-            "level": log_level,
+            "level": LOG_LEVEL,
             "handlers": ["consoleHandler"],
             "propagate": False
         }
     }
 
-    if save_to_file:
+    if SAVE_LOG_TO_FILE:
         loggers["analysisLogger"]["handlers"].append("fileHandler")
 
     dict_config = {

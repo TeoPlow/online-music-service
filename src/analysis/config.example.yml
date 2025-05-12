@@ -1,6 +1,11 @@
+# Пример файла конфигурации, рабочий назвать config.yml
+
 log:
   level: INFO
   save_to_file: False
+
+paths:
+  # base_dir: /path/to/online-music-service/src/analysis/
 
 kafka:
   bootstrap_servers: localhost:9092

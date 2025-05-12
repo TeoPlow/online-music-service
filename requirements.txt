@@ -1,6 +1,10 @@
+click==8.2.0
 clickhouse-driver==0.2.9
+clickhouse-migrate==0.0.4
 colorama==0.4.6
+envparse==0.2.0
 Faker==37.1.0
+importlib_metadata==8.7.0
 iniconfig==2.1.0
 kafka-python==2.2.4
 packaging==25.0
@@ -12,3 +16,4 @@ PyYAML==6.0.2
 tzdata==2025.2
 tzlocal==5.3.1
 yml==0.0.1
+zipp==3.21.0
