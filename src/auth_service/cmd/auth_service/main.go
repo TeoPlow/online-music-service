@@ -1,5 +1,5 @@
-// Package main является точкой входа для сервиса аутентификации.
-package main
+// Package auth_service является точкой входа для сервиса аутентификации.
+package auth_service
 
 import (
 	"log/slog"
@@ -9,9 +9,9 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/TeoPlow/online-music-service/auth_service/internal/app"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/config"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/logger"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/app"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/config"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/logger"
 )
 
 func main() {

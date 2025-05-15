@@ -6,14 +6,14 @@ import (
 	"os"
 	"time"
 
-	grpcapp "github.com/TeoPlow/online-music-service/auth_service/internal/app/grpc"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/config"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/grpc/auth"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/logger"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/pkg/jwt"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/repository/postgres"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/service"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/storage"
+	grpcapp "github.com/TeoPlow/online-music-service/src/auth_service/internal/app/grpc"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/config"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/grpc/auth"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/logger"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/pkg/jwt"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/repository/postgres"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/service"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/storage"
 )
 
 type App struct {

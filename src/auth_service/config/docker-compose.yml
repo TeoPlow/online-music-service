@@ -5,23 +5,16 @@ services:
     environment:
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: testpass
-      POSTGRES_DB: testdb
+      POSTGRES_DB: auth_db
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "testuser", "-d", "auth_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data
-    networks:
-      - testnet
-
-  migrate:
-    build:
-      context: .
-      dockerfile: migrate/Dockerfile
-    depends_on:
-      - postgres
-    environment:
-      DB_URL: postgres://testuser:testpass@postgres:5432/testdb?sslmode=disable
-      MIGRATIONS_DIR: ./migrations
     networks:
       - testnet
 

@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/TeoPlow/online-music-service/auth_service/internal/logger"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/logger"
 )
 
 type LoggingInterceptor struct {
@@ -32,7 +32,7 @@ func (i *LoggingInterceptor) Unary(ctx context.Context,
 
 	duration := time.Since(start)
 	if err != nil {
-		logger.Log.Error("request failed",
+		logger.Log.Debug("request failed",
 			"method", info.FullMethod,
 			"duration", duration,
 			"error", err,
