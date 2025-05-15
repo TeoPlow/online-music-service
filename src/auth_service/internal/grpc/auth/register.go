@@ -3,9 +3,10 @@ package auth
 import (
 	"context"
 
-	authproto "github.com/zhavkk/Auth-protobuf/gen/go/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	authproto "github.com/TeoPlow/online-music-service/src/auth_service/pkg/authpb"
 )
 
 func (s *serverAPI) Register(ctx context.Context,

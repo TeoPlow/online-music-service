@@ -3,10 +3,13 @@ package auth
 
 import (
 	"context"
+	"errors"
 
-	authproto "github.com/zhavkk/Auth-protobuf/gen/go/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/service"
+	authproto "github.com/TeoPlow/online-music-service/src/auth_service/pkg/authpb"
 )
 
 func (s *serverAPI) Login(ctx context.Context,
@@ -18,6 +21,9 @@ func (s *serverAPI) Login(ctx context.Context,
 
 	resp, err := s.service.Login(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
+		if errors.Is(err, service.ErrFailedToGenerateToken) {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 

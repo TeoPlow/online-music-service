@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"github.com/golang-jwt/jwt/v5"
-	authproto "github.com/zhavkk/Auth-protobuf/gen/go/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	authproto "github.com/TeoPlow/online-music-service/src/auth_service/pkg/authpb"
 )
 
 func (s *serverAPI) SetUserRole(ctx context.Context,

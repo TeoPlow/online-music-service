@@ -1,6 +1,6 @@
 env: local
 
-db_url: postgres://testuser:testpass@localhost:5433/testdb?sslmode=disable
+db_url: postgres://testuser:testpass@localhost:5433/auth_db?sslmode=disable
   
 token_ttl: 1h
 

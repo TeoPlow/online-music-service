@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/zhavkk/Auth-protobuf/gen/go/auth"
+	auth "github.com/TeoPlow/online-music-service/src/auth_service/pkg/authpb"
 )
 
 func ValidateRegisterRequest(req *auth.RegisterRequest) error {

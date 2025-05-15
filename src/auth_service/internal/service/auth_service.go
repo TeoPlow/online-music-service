@@ -10,11 +10,11 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/TeoPlow/online-music-service/auth_service/internal/logger"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/models"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/pkg/jwt"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/repository/postgres"
-	"github.com/TeoPlow/online-music-service/auth_service/internal/storage"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/logger"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/models"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/pkg/jwt"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/repository/postgres"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/storage"
 )
 
 type AuthService struct {

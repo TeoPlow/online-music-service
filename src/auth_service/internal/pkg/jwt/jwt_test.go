@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TeoPlow/online-music-service/auth_service/internal/models"
+	"github.com/TeoPlow/online-music-service/src/auth_service/internal/models"
 )
 
 func TestNewToken(t *testing.T) {

@@ -31,7 +31,6 @@ func MustLoad() *Config {
 		log.Fatalf("config file does not exist: %s", configPath)
 	}
 	var cfg Config
-	// need to go get cleanenv
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
 		log.Fatalf("can't read config %s", err.Error())
 	}
