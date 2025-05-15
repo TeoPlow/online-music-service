@@ -1,14 +1,14 @@
-# Пример файла конфигурации, рабочий назвать config.yml
+# Пример config.yml
 
 log:
   level: INFO
   save_to_file: False
 
 paths:
-  # base_dir: /path/to/online-music-service/src/analysis/
+  base_dir: /path/to/online-music-service/src/analysis
 
 kafka:
-  bootstrap_servers: localhost:9092
+  bootstrap_servers: kafka:9092
   topics:
     - auth-users
     - music-artists
@@ -18,8 +18,8 @@ kafka:
     - music-liked-tracks
 
 clickhouse:
-  host: localhost
+  host: clickhouse
   port: 9000
-  user: default
+  user: default # Не пашет
   password: "mysecurepassword"
   database: music_streaming

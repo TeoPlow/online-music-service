@@ -1,0 +1,25 @@
+# Пример config.test.yml
+
+log:
+  level: DEBUG
+  save_to_file: False
+
+paths:
+  base_dir: /path/to/online-music-service/src/analysis
+
+kafka:
+  bootstrap_servers: localhost:9094
+  topics:
+    - auth-users
+    - music-artists
+    - music-albums
+    - music-tracks
+    - music-liked-artists
+    - music-liked-tracks
+
+clickhouse:
+  host: localhost
+  port: 9000
+  user: default # Не пашет 
+  password: "mysecurepassword"
+  database: music_streaming

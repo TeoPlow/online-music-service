@@ -9,3 +9,4 @@ __pycache__/
 .pytest*
 
 config.yml
+config.test.yml
