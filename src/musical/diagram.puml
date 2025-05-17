@@ -1,0 +1,83 @@
+@startuml diagram
+left to right direction
+
+package internal/controllers {
+    class GRPCServer {
+        -trackService
+        -albumService
+        -artistService
+        -likedService
+        -streamingService
+    }
+    class HTTPServer {
+        -trackService
+        -albumService
+        -artistService
+        -likedService
+        -streamingService
+    }
+}
+
+package internal/domain {
+    class TrackService {
+        -albumDelegate: AlbumService
+        -streamingDelegate: StreamingService
+        -trackRepo: TrackRepository
+    }
+    class AlbumService {
+        -artistDelegate: ArtistService
+        -albumRepo: AlbumRepository
+    }
+    class ArtistService {
+        -artistRepo: ArtistRepository
+    }
+    class LikedService {
+        -trackDelegate: TrackService
+        -artistDelegate: ArtistService
+        -likedRepo: LikedRepository
+    }
+    class StreamingService {
+        -streamingRepo: StreamingRepository
+    }
+}
+
+package internal/storage {
+    class TrackRepository {
+        -db: Postgres
+        -cache: Redis (если нужен)
+    }
+    class AlbumRepository {
+        -db: Postgres
+        -cache: Redis (если нужен)
+    }
+    class ArtistRepository {
+        -db: Postgres
+        -cache: Redis (если нужен)
+    }
+    class LikedRepository {
+        -db: Postgres
+        -cache: Redis (если нужен)
+    }
+    class StreamingRepository {
+        -db: MiniO
+    }
+}
+
+"GRPCServer" ====> "internal/domain"
+"HTTPServer" ====> "internal/domain"
+
+"TrackService" .> "AlbumService"
+"TrackService" .> "StreamingService"
+"TrackService" --> "TrackRepository"
+
+"AlbumService" .> ArtistService
+"AlbumService" --> "AlbumRepository"
+
+"ArtistService" --> "ArtistRepository"
+
+"LikedService" .> "ArtistService"
+"LikedService" .> "TrackService"
+"LikedService" --> "LikedRepository"
+
+"StreamingService" --> "StreamingRepository"
+@enduml
