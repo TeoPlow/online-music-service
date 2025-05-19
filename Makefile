@@ -1,4 +1,4 @@
-SERVICES := musical # Сюда пишем название папки сервиса через пробел
+SERVICES := musical auth_service # Сюда пишем название папки сервиса через пробел
 PYENV=python -m 
 
 
