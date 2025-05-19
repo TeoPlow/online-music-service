@@ -47,3 +47,16 @@ test-deps-up: compose-up migrate-up
 
 .PHONY: test-deps-down
 test-deps-down: compose-down
+# Protobuf
+.PHONY: gen-pb
+gen-pb:
+	@protoc --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative \
+		    --go_out=pkg/authpb --go-grpc_out=pkg/authpb \
+		    -I api api/auth_proto.proto
+
+# for tests
+.PHONY: test-deps-up
+test-deps-up: compose-up migrate-up
+
+.PHONY: test-deps-down
+test-deps-down: compose-down

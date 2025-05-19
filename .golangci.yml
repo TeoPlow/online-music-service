@@ -101,7 +101,9 @@ linters-settings:
             - "github.com/joho/godotenv"
             - "github.com/ilyakaznacheev/cleanenv"
             #crypto
+            #crypto
             - "golang.org/x/crypto/bcrypt"
+            # grpc
             # grpc
             - "google.golang.org/grpc"
             # redis
@@ -135,6 +137,8 @@ issues:
     - path: "cmd/.*/main.go"
       linters:
         - revive
+        - unused
+      
         - unused
       
 
