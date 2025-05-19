@@ -70,7 +70,6 @@ func ValidateChangePasswordRequest(req *auth.ChangePasswordRequest) error {
 	return ValidatePassword(req.GetNewPassword())
 }
 
-// for registration
 func ValidateRegistrationRole(role string) error {
 	if role == "" {
 		return errors.New("role is required")
@@ -81,6 +80,20 @@ func ValidateRegistrationRole(role string) error {
 	}
 	if !validRoles[strings.ToLower(role)] {
 		return errors.New("role must be either 'user' or 'artist'")
+	}
+	return nil
+}
+
+func ValidateRefreshTokenRequest(req *auth.RefreshTokenRequest) error {
+	if req.GetRefreshToken() == "" {
+		return errors.New("refresh token is required")
+	}
+	return nil
+}
+
+func ValidateLogoutRequest(req *auth.LogoutRequest) error {
+	if req.GetRefreshToken() == "" {
+		return errors.New("refresh token is required")
 	}
 	return nil
 }

@@ -53,6 +53,14 @@ type AuthService interface {
 		oldPassword string,
 		newPassword string,
 	) (*models.ChangePasswordResponse, error)
+	RefreshToken(
+		ctx context.Context,
+		refreshToken string,
+	) (*models.RefreshTokenResponse, error)
+	Logout(
+		ctx context.Context,
+		refreshToken string,
+	) (*models.LogoutResponse, error)
 }
 
 type serverAPI struct {

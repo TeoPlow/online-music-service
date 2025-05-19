@@ -1,43 +1,38 @@
-// Package auth_service является точкой входа для сервиса аутентификации.
-package auth_service
+// Package main является точкой входа для сервиса аутентификации.
+package main
 
 import (
-	"log/slog"
+	"context"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/joho/godotenv"
-
 	"github.com/TeoPlow/online-music-service/src/auth_service/internal/app"
-	"github.com/TeoPlow/online-music-service/src/auth_service/internal/config"
 	"github.com/TeoPlow/online-music-service/src/auth_service/internal/logger"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		logger.Log.Error("Error loading .env file", "error", err)
-		os.Exit(1)
+	os.Exit(run())
+}
+
+func run() int {
+	cfg, err := app.SetupApplication()
+	if err != nil {
+		log.Printf("Application setup failed: %v\n", err)
+		return 1
 	}
-	cfg := config.MustLoad()
 
-	logger.Init(cfg.Env)
+	logger.Log.Info("Starting application")
 
-	logger.Log.Info("starting app", slog.Any("env", cfg))
-	application := app.New(cfg.GRPC.Port, cfg.TokenTTL)
+	ctx, stopSignal := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stopSignal()
 
-	go func() {
-		application.GRPCsrv.MustRun()
-	}()
+	if err := app.StartApplication(ctx, cfg); err != nil {
+		logger.Log.Error("application run failed", "error", err)
+		return 1
+	}
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
-
-	marker := <-stop
-
-	logger.Log.Info("stopping application ", slog.String("signal: ", marker.String()))
-
-	application.GRPCsrv.Stop()
-
-	logger.Log.Info("application stopped successfully")
+	logger.Log.Info("application exited gracefully")
+	return 0
 }

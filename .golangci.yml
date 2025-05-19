@@ -93,6 +93,7 @@ linters-settings:
             - "github.com/golang-jwt/jwt/v5"
             - "github.com/jackc/pgx/v5"
             - "github.com/georgysavva/scany/pgxscan"
+            - "time"
             # test
             - "go.uber.org/mock/gomock"
             - "github.com/stretchr/testify"
@@ -103,7 +104,8 @@ linters-settings:
             - "golang.org/x/crypto/bcrypt"
             # grpc
             - "google.golang.org/grpc"
-            
+            # redis
+            - "github.com/redis/go-redis/v9"
             #internal packages
             - "github.com/TeoPlow/online-music-service/src/auth_service"
         

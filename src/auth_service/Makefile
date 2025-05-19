@@ -16,7 +16,10 @@ run: build
 # Docker
 .PHONY: compose-up
 compose-up:
-	@docker compose -f $(COMPOSE_PATH) up -d 
+	@docker compose -f $(COMPOSE_PATH) up -d
+	@docker compose -f $(COMPOSE_PATH) exec -T postgres bash -c \
+	'until pg_isready -U testuser -d auth_db; do sleep 1; done'
+
 
 .PHONY: compose-down
 compose-down:

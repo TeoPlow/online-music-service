@@ -11,6 +11,8 @@ type Validator interface {
 	ValidateGetUserRequest(req *auth.GetUserRequest) error
 	ValidateUpdateUserRequest(req *auth.UpdateUserRequest) error
 	ValidateChangePasswordRequest(req *auth.ChangePasswordRequest) error
+	ValidateRefreshTokenRequest(req *auth.RefreshTokenRequest) error
+	ValidateLogoutRequest(req *auth.LogoutRequest) error
 }
 
 func NewValidator() Validator {
@@ -41,4 +43,12 @@ func (v *validator) ValidateUpdateUserRequest(req *auth.UpdateUserRequest) error
 
 func (v *validator) ValidateChangePasswordRequest(req *auth.ChangePasswordRequest) error {
 	return ValidateChangePasswordRequest(req)
+}
+
+func (v *validator) ValidateRefreshTokenRequest(req *auth.RefreshTokenRequest) error {
+	return ValidateRefreshTokenRequest(req)
+}
+
+func (v *validator) ValidateLogoutRequest(req *auth.LogoutRequest) error {
+	return ValidateLogoutRequest(req)
 }
