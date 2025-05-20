@@ -40,7 +40,6 @@ func TestUserRepository_Postgres(t *testing.T) {
 	defer db.Close()
 
 	cfg := config.Config{
-
 		DBURL: "postgres://testuser:testpass@localhost:5432/auth_db?sslmode=disable",
 	}
 

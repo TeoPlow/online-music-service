@@ -10,7 +10,6 @@ import (
 
 type config struct {
 	DBConn   string `yaml:"dbconnection"`
-	HTTPPort string `yaml:"http_port"`
 	GRPCPort string `yaml:"grpc_port"`
 	Log      struct {
 		Level string `yaml:"level"`

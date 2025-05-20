@@ -14,6 +14,8 @@ type TxManager struct {
 	db Database
 }
 
+type txKey struct{}
+
 func NewTxManager(ctx context.Context) (*TxManager, error) {
 	pool, err := pgxpool.Connect(ctx, config.Config.DBConn)
 	if err != nil {
@@ -51,6 +53,8 @@ func (m *TxManager) beginFunc(ctx context.Context, opts pgx.TxOptions, f func(co
 	defer func() {
 		_ = tx.Rollback(ctx)
 	}()
+
+	ctx = context.WithValue(ctx, txKey{}, &tx)
 
 	if err := f(ctx); err != nil {
 		return err
