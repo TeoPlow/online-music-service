@@ -101,11 +101,10 @@ linters-settings:
             - "github.com/joho/godotenv"
             - "github.com/ilyakaznacheev/cleanenv"
             #crypto
-            #crypto
             - "golang.org/x/crypto/bcrypt"
             # grpc
-            # grpc
             - "google.golang.org/grpc"
+            - "google.golang.org/protobuf/types/known/timestamppb"
             # redis
             - "github.com/redis/go-redis/v9"
             #internal packages
