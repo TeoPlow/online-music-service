@@ -55,6 +55,10 @@ linters-settings:
           - context
           - flag
           - log
+          - os
+          - os/signal
+          - syscall
+          - github.com/joho/godotenv 
           - "github.com/TeoPlow/online-music-service"
       musical-internal:
         list-mode: strict
@@ -76,12 +80,44 @@ linters-settings:
           # internal packages
           - "github.com/TeoPlow/online-music-service/src/musical/internal"
           - "github.com/TeoPlow/online-music-service/src/musical/pkg"
+      auth_service-internal:
+        list-mode: strict
+        files:
+          - "**/auth_service/internal/**"
+          - "**/auth_service/auth_test/**"
+          - "**/auth_service/**/*.go"
+        allow:
+            # std
+            - $gostd
+            - "github.com/google/uuid"
+            - "github.com/golang-jwt/jwt/v5"
+            - "github.com/jackc/pgx/v5"
+            - "github.com/georgysavva/scany/pgxscan"
+            - "time"
+            # test
+            - "go.uber.org/mock/gomock"
+            - "github.com/stretchr/testify"
+            #env
+            - "github.com/joho/godotenv"
+            - "github.com/ilyakaznacheev/cleanenv"
+            #crypto
+            #crypto
+            - "golang.org/x/crypto/bcrypt"
+            # grpc
+            # grpc
+            - "google.golang.org/grpc"
+            # redis
+            - "github.com/redis/go-redis/v9"
+            #internal packages
+            - "github.com/TeoPlow/online-music-service/src/auth_service"
+        
       other:
         list-mode: strict
         files:
           - $all
           - "!**/cmd/**"
           - "!**/musical/**"
+          - "!**/auth_service/**"
         allow:
           - $gostd
     
@@ -101,6 +137,10 @@ issues:
     - path: "cmd/.*/main.go"
       linters:
         - revive
+        - unused
+      
+        - unused
+      
 
 output:
   formats: colored-line-number

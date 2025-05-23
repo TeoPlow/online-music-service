@@ -10,3 +10,4 @@ __pycache__/
 
 config.yml
 config.test.yml
+.env
