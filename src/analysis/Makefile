@@ -4,12 +4,16 @@ CONFIG_PATH=./config.yml
 COMPOSE_PATH=./docker-compose.yml
 TESTS_PATH=./tests
 
-.PHONY: setup-venv start-services stop-services remove-volumes clickhouse-shell
+.PHONY: setup-venv start-services stop-services remove-volumes postgres-shell
 
 # Запуск сервисов в фоне
 start-services:
 	@echo "Starting services..."
 	docker-compose -f ${COMPOSE_PATH} up --build -d
+
+start-services+:
+	@echo "Starting services..."
+	docker-compose -f ${COMPOSE_PATH} up --build
 
 # Остановка сервисов
 stop-services:
@@ -21,10 +25,10 @@ remove-volumes:
 	@echo "Removing volumes..."
 	docker-compose -f ${COMPOSE_PATH} down --volumes
 
-# Открытие оболочки ClickHouse
-clickhouse-shell:
-	@echo "Opening ClickHouse shell..."
-	docker exec -it clickhouse-server clickhouse-client
+# Открытие оболочки Postgres
+postgres-shell:
+	@echo "Opening PostgreSQL shell..."
+	docker exec -it analysis-postgres-1 psql -U postgres
 
 # Вывод всех логов
 full-logs:

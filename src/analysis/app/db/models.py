@@ -1,9 +1,8 @@
 from uuid import UUID
 from datetime import date, datetime
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel
-from asynch import DictCursor
-from app.db.clickhouse import get_clickhouse_client
+from app.db.connection import get_db_client
 
 from app.core.logger import get_logger
 log = get_logger(__name__)
@@ -16,8 +15,6 @@ class User(BaseModel):
     country: str
     age: int
     role: str
-    liked_tracks: List[UUID]
-    liked_artists: List[UUID]
     created_at: datetime
     updated_at: datetime
 
@@ -28,14 +25,14 @@ class User(BaseModel):
         """
         log.info(f"Fetching latest user by ID: {user_id}")
 
-        client = await get_clickhouse_client()
-        async with client.cursor(cursor=DictCursor) as cursor:
-            await cursor.execute(f"""
+        client = await get_db_client()
+        async with client.acquire() as conn:
+            query = """
                 SELECT * FROM music_streaming.users
-                WHERE id = '{user_id}'
+                WHERE id = $1
                 ORDER BY updated_at DESC LIMIT 1
-            """)
-            result = await cursor.fetchall()
+            """
+            result = await conn.fetch(query, user_id)
 
         if not result:
             return None
@@ -48,8 +45,6 @@ class User(BaseModel):
             country=row["country"],
             age=row["age"],
             role=row["role"],
-            liked_tracks=row.get("liked_tracks", []),
-            liked_artists=row.get("liked_artists", []),
             created_at=row["created_at"],
             updated_at=row["updated_at"]
         )
@@ -92,14 +87,14 @@ class Artist(BaseModel):
         """
         log.info(f"Fetching latest artist by ID: {artist_id}")
 
-        client = await get_clickhouse_client()
-        async with client.cursor(cursor=DictCursor) as cursor:
-            await cursor.execute(f"""
+        client = await get_db_client()
+        async with client.acquire() as conn:
+            query = """
                 SELECT * FROM music_streaming.artists
-                WHERE id = '{artist_id}'
+                WHERE id = $1
                 ORDER BY updated_at DESC LIMIT 1
-            """)
-            result = await cursor.fetchall()
+            """
+            result = await conn.fetch(query, artist_id)
 
         if not result:
             return None
@@ -121,3 +116,13 @@ class Event(BaseModel):
     event_time: datetime
     user_id: UUID
     track_id: UUID
+
+
+class LikedTrack(BaseModel):
+    user_id: UUID
+    track_id: UUID
+
+
+class LikedArtist(BaseModel):
+    user_id: UUID
+    artist_id: UUID

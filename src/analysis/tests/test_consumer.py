@@ -1,6 +1,7 @@
 import asyncio
 import pytest
 from app.db.models import User
+
 from tests.fake_producers.fake_auth_producer import send_auth_user
 from app.core.settings import settings
 
@@ -9,15 +10,15 @@ from app.core.settings import settings
 async def test_one_message_to_consumer():
     """
     Отправляет пользовательские данные в Kafka и проверяет,
-    были ли они успешно вставлены в ClickHouse через Kafka Consumer.
+    были ли они успешно вставлены в Database через Kafka Consumer.
     """
-    ch = settings.clickhouse
+    pg = settings.postgres
     print(
-        f"[CONFIG] ClickHouse settings:\n"
-        f"  host={ch.host}\n"
-        f"  port={ch.port}\n"
-        f"  user={ch.user}\n"
-        f"  password={ch.password[:4]+'***' if ch.password else '(empty)'}\n"
+        f"[CONFIG] Database settings:\n"
+        f"  host={pg.host}\n"
+        f"  port={pg.port}\n"
+        f"  user=postgres\n"
+        f"  password={pg.password[:4]+'***' if pg.password else '(empty)'}\n"
     )
 
     user: dict = (await send_auth_user(num_iterations=1))[0]
@@ -36,7 +37,6 @@ async def test_one_message_to_consumer():
         assert False is user["gender"]
     assert retrieved_user.age == user["age"]
 
-    # Миллисекунды ClickHouse не хранит (вроде)
     date = retrieved_user.created_at.strftime('%Y-%m-%dT%H:%M:%S')
     assert date == user["created_at"]
     assert retrieved_user.country == user["country"]
@@ -46,7 +46,7 @@ async def test_one_message_to_consumer():
 async def test_multiple_messages_to_consumer():
     """
     Отправляет несколько пользовательских данных в Kafka и проверяет,
-    были ли они успешно вставлены в ClickHouse через Kafka Consumer.
+    были ли они успешно вставлены в Database через Kafka Consumer.
     """
     users: list[dict] = await send_auth_user(num_iterations=5)
     await asyncio.sleep(5)
@@ -62,7 +62,7 @@ async def test_multiple_messages_to_consumer():
             assert False is user["gender"]
         assert retrieved_user.age == user["age"]
 
-        # Миллисекунды ClickHouse не хранит (вроде)
+        # Миллисекунды Database не хранит (вроде)
         date = retrieved_user.created_at.strftime('%Y-%m-%dT%H:%M:%S')
         assert date == user["created_at"]
         assert retrieved_user.country == user["country"]

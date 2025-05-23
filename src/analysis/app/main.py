@@ -1,6 +1,7 @@
 import asyncio
 from app.kafka.consumer import consume
-from app.db.migrations import run_clickhouse_migrations
+from app.db.connection import connection_check
+from app.core.settings import settings
 
 from app.core.logger import get_logger
 log = get_logger(__name__)
@@ -11,16 +12,23 @@ async def main():
     try:
         for attempt in range(10):
             try:
-                await run_clickhouse_migrations()
+                await connection_check()
                 break
             except Exception:
                 log.warning(f"""
-                    ClickHouse not ready yet. Retrying in 5 seconds...
+                    Database not ready yet. Retrying in 5 seconds...
                     (Attempt {attempt + 1}/10)
                 """)
                 await asyncio.sleep(5)
         else:
-            log.error("Failed to connect to ClickHouse.")
+            log.error(f"""
+                Failed to connect to Database.
+                    host={settings.postgres.host},
+                    port={settings.postgres.port},
+                    user={settings.postgres.user},
+                    password=***,
+                    database={settings.postgres.database},
+            """)
 
         for attempt in range(10):
             try:

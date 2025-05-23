@@ -17,7 +17,7 @@ kafka:
     - music-liked-artists
     - music-liked-tracks
 
-clickhouse:
+postgres:
   host: localhost
   port: 9000
   user: default # Не пашет 

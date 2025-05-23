@@ -9,10 +9,10 @@ from app.core.config import load_yaml_config
 env = os.getenv("APP_ENV", "default")
 if env == "test":
     kafka_bootstrap = "localhost:9094"
-    clickhouse_host = "localhost"
+    db_host = "localhost"
 else:
     kafka_bootstrap = "kafka:9092"
-    clickhouse_host = "clickhouse"
+    db_host = "postgres"
 
 
 class LogConfig(BaseSettings):
@@ -32,11 +32,11 @@ class KafkaConfig(BaseSettings):
     ]
 
 
-class ClickHouseConfig(BaseSettings):
-    host: str = Field(default_factory=lambda: clickhouse_host)
-    port: int = 9000
-    user: str = "default"
-    password: str = 'mysecurepassword'
+class PostgresConfig(BaseSettings):
+    host: str = Field(default_factory=lambda: db_host)
+    port: int = 5433 if env == "test" else 5432
+    user: str = "postgres"
+    password: str = "mypassword"
     database: str = "music_streaming"
 
 
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     log: LogConfig = LogConfig()
     paths: AppConfig = AppConfig()
     kafka: KafkaConfig = KafkaConfig()
-    clickhouse: ClickHouseConfig = ClickHouseConfig()
+    postgres: PostgresConfig = PostgresConfig()
 
     model_config = ConfigDict(
         env_nested_delimiter="__",

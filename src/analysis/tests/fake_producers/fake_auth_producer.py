@@ -53,8 +53,3 @@ async def send_auth_user(num_iterations=1):
     finally:
         await producer.stop()
     return users
-
-
-if __name__ == '__main__':
-    import asyncio
-    asyncio.run(send_auth_user())
