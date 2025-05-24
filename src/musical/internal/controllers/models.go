@@ -10,6 +10,14 @@ import (
 	"github.com/TeoPlow/online-music-service/src/musical/internal/models/dto"
 )
 
+type TrackService interface {
+	CreateTrack(context.Context, dto.CreateTrackRequest) (models.Track, error)
+	UpdateTrack(context.Context, dto.UpdateTrackRequest) (models.Track, error)
+	DeleteTrack(ctx context.Context, id uuid.UUID) error
+	GetTrack(ctx context.Context, id uuid.UUID) (models.Track, error)
+	ListTracks(context.Context, dto.ListTracksRequest) ([]models.Track, error)
+}
+
 type AlbumService interface {
 	CreateAlbum(context.Context, dto.CreateAlbumRequest) (models.Album, error)
 	UpdateAlbum(context.Context, dto.UpdateAlbumRequest) (models.Album, error)

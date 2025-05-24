@@ -18,6 +18,7 @@ type Server struct {
 	musicalpb.UnimplementedMusicalServiceServer
 	artistService controllers.ArtistService
 	albumService  controllers.AlbumService
+	trackService  controllers.TrackService
 
 	grpcServer *grpc.Server
 	listener   net.Listener
@@ -26,10 +27,12 @@ type Server struct {
 func NewServer(
 	artistServ controllers.ArtistService,
 	albumServ controllers.AlbumService,
+	trackServ controllers.TrackService,
 ) *Server {
 	return &Server{
 		artistService: artistServ,
 		albumService:  albumServ,
+		trackService:  trackServ,
 	}
 }
 

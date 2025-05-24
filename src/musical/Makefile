@@ -65,7 +65,9 @@ gen-pb:
 gen-mock:
 	@find . -name '*_mock.go' -delete
 	mockgen -destination=tests/mocks/album_repo_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain AlbumRepo
+	mockgen -destination=tests/mocks/track_repo_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain TrackRepo
 	mockgen -destination=tests/mocks/artist_service_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain ArtistClient
+	mockgen -destination=tests/mocks/album_service_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain AlbumClient
 	mockgen -destination=tests/mocks/tx_manager_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain TxManager
 
 # for tests

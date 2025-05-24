@@ -43,7 +43,10 @@ func main() {
 	albumRepo := storage.NewAlbumRepo(tmanager.GetDatabase())
 	albums := domain.NewAlbumService(albumRepo, tmanager, artists)
 
-	grpcServer := grpc.NewServer(artists, albums)
+	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase())
+	tracks := domain.NewTrackService(trackRepo, tmanager, albums)
+
+	grpcServer := grpc.NewServer(artists, albums, tracks)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)

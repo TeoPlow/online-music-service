@@ -16,6 +16,9 @@ var (
 	ErrSQL       = errors.New("error in SQL query")
 )
 
+// Порог, который используется для текстового поиска
+const threshold = 0.1
+
 type Executor interface {
 	Select(ctx context.Context, dst any, query string, args ...any) error
 	Get(ctx context.Context, dst any, query string, args ...any) error
