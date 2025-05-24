@@ -118,8 +118,8 @@ func buildAlbumsFilterQuery(offset, limit int, searchQuery *string,
 	sb.WriteString("SELECT * FROM albums WHERE 1=1")
 
 	if searchQuery != nil {
-		sb.WriteString(fmt.Sprintf(" AND title LIKE $%d", argIndex))
-		args = append(args, "%"+*searchQuery+"%")
+		sb.WriteString(fmt.Sprintf(" AND similarity(title, $%d) > %f", argIndex, threshold))
+		args = append(args, *searchQuery)
 		argIndex++
 	}
 

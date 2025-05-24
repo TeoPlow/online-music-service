@@ -37,10 +37,6 @@ message UpdateTrackRequest {
     optional bool is_explicit = 7;
 }
 
-message DeleteTrackRequest {
-    string id = 1;
-}
-
 message ListTracksRequest {
     int32 page = 1;
     int32 page_size = 2;

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
@@ -109,4 +110,73 @@ func protoFromArtist(a models.Artist) *pb.Artist {
 		CreatedAt:   timestamppb.New(a.CreatedAt),
 		UpdatedAt:   timestamppb.New(a.UpdatedAt),
 	}
+}
+
+func protoFromTrack(t models.Track) *pb.Track {
+	return &pb.Track{
+		Id:         t.ID.String(),
+		Title:      t.Title,
+		AlbumId:    t.AlbumID.String(),
+		Genre:      t.Genre,
+		Duration:   int32(t.Duration.Seconds()),
+		Lyrics:     t.Lyrics,
+		IsExplicit: t.IsExplicit,
+		CreatedAt:  timestamppb.New(t.CreatedAt),
+		UpdatedAt:  timestamppb.New(t.UpdatedAt),
+	}
+}
+
+func protoToCreateTrackRequest(p *pb.CreateTrackRequest) (dto.CreateTrackRequest, error) {
+	albumID, err := uuid.Parse(p.GetAlbumId())
+	if err != nil {
+		return dto.CreateTrackRequest{}, err
+	}
+	return dto.CreateTrackRequest{
+		Title:      p.Title,
+		AlbumID:    albumID,
+		Genre:      p.Genre,
+		Duration:   time.Duration(p.GetDuration()) * time.Second,
+		Lyrics:     p.Lyrics,
+		IsExplicit: p.IsExplicit,
+	}, nil
+}
+
+func protoToUpdateTrackRequest(p *pb.UpdateTrackRequest) (dto.UpdateTrackRequest, error) {
+	albumID, err := uuid.Parse(p.GetAlbumId())
+	if err != nil {
+		return dto.UpdateTrackRequest{}, err
+	}
+	id, err := uuid.Parse(p.GetId())
+	if err != nil {
+		return dto.UpdateTrackRequest{}, err
+	}
+	duration := time.Duration(p.GetDuration()) * time.Second
+	return dto.UpdateTrackRequest{
+		ID:         id,
+		Title:      p.Title,
+		AlbumID:    &albumID,
+		Genre:      p.Genre,
+		Duration:   &duration,
+		Lyrics:     p.Lyrics,
+		IsExplicit: p.IsExplicit,
+	}, nil
+}
+
+func protoToListTracksRequest(p *pb.ListTracksRequest) (dto.ListTracksRequest, error) {
+	req := dto.ListTracksRequest{
+		Page:        int(p.GetPage()),
+		PageSize:    int(p.GetPageSize()),
+		Genre:       p.Genre,
+		SearchQuery: p.SearchQuery,
+	}
+
+	if p.AlbumId != nil {
+		albumID, err := uuid.Parse(*p.AlbumId)
+		if err != nil {
+			return dto.ListTracksRequest{}, err
+		}
+		req.AlbumID = &albumID
+	}
+
+	return req, nil
 }

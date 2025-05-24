@@ -23,10 +23,7 @@ import (
 
 const bufSize = 1024 * 1024
 
-var (
-	listener      *bufconn.Listener
-	serverStarted = make(chan struct{})
-)
+var listener *bufconn.Listener
 
 type BaseIntegrationSuite struct {
 	suite.Suite
@@ -39,6 +36,7 @@ type BaseIntegrationSuite struct {
 
 	AlbumRepo  *storage.AlbumRepository
 	ArtistRepo *storage.ArtistRepository
+	TrackRepo  *storage.TrackRepository
 
 	TxM *db.TxManager
 }
@@ -61,23 +59,24 @@ func (s *BaseIntegrationSuite) SetupSuite() {
 	albumRepo := storage.NewAlbumRepo(tmanager.GetDatabase())
 	albumService := domain.NewAlbumService(albumRepo, tmanager, artistService)
 
+	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase())
+	trackService := domain.NewTrackService(trackRepo, tmanager, albumService)
+
 	// bufconn listener
 	listener = bufconn.Listen(bufSize)
 	server := grpc.NewServer()
 
 	// grpc ctrl init + registration
-	grpcSrv := grpcctrl.NewServer(artistService, albumService)
+	grpcSrv := grpcctrl.NewServer(artistService, albumService, trackService)
 	grpcSrv.Register(server)
 
 	go func() {
-		close(serverStarted)
 		if err := server.Serve(listener); err != nil {
 			log.Fatalf("server.Serve failed: %v", err)
 		}
 	}()
 
 	// dial bufconn
-	<-serverStarted
 	conn, err := grpc.NewClient("passthrough:///bufnet",
 		grpc.WithContextDialer(bufDialer),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -88,6 +87,7 @@ func (s *BaseIntegrationSuite) SetupSuite() {
 	s.Client = pb.NewMusicalServiceClient(conn)
 	s.AlbumRepo = albumRepo
 	s.ArtistRepo = artistRepo
+	s.TrackRepo = trackRepo
 	s.TxM = tmanager
 }
 

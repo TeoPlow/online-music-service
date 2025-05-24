@@ -5,7 +5,7 @@ CREATE TABLE "tracks"(
     "title" VARCHAR(255) NOT NULL,
     "album_id" UUID NOT NULL,
     "genre" VARCHAR(255) NOT NULL,
-    "duration" INTEGER NOT NULL,
+    "duration" BIGINT NOT NULL,
     "lyrics" TEXT NULL,
     "is_explicit" BOOLEAN NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL,
@@ -40,6 +40,12 @@ CREATE TABLE "liked_tracks"(
     "track_id" UUID NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL
 );
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX trgm_idx_tracks_title ON tracks USING gin (title gin_trgm_ops);
+CREATE INDEX trgm_idx_tracks_lyrics ON tracks USING gin (lyrics gin_trgm_ops);
+
+CREATE INDEX trgm_idx_albums_title ON albums USING gin (title gin_trgm_ops);
 
 -- +goose StatementEnd
 
