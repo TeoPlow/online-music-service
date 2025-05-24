@@ -27,7 +27,6 @@ func (s *serverAPI) Register(ctx context.Context,
 		req.GetAge(),
 		req.GetRole(),
 	)
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

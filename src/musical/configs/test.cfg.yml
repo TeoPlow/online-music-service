@@ -1,0 +1,6 @@
+dbconnection: postgresql://test:test@localhost:5432/test-musical
+grpc_port: :50001
+
+log:
+  level: debug
+  file: logs.json

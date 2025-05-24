@@ -55,45 +55,41 @@ test:
 	@if [ -n "$(SERVICE)" ]; then \
 		echo "Running tests only for $(SERVICE)..."; \
 		echo "=> Starting dependencies for $(SERVICE)..."; \
-		cd ./src/$(SERVICE) && $(MAKE) test-deps-up; \
-		cd - > /dev/null; \
+		(cd ./src/$(SERVICE) && $(MAKE) -s test-deps-up) || echo "No test-deps-up for $(SERVICE)"; \
 		echo "=> Running Go tests..."; \
 		if find ./src/$(SERVICE) -type f -name '*.go' | grep -q .; then \
-			go test -v ./src/$(SERVICE)/...; \
+			go test -v ./src/$(SERVICE)/... || exit 1; \
 		else \
 			echo "No Go files found in ./src/$(SERVICE)."; \
 		fi; \
 		echo "=> Running Python tests..."; \
 		if find ./src/$(SERVICE) -type f -name '*_test.py' | grep -q .; then \
-			pytest ./src/$(SERVICE); \
+			pytest ./src/$(SERVICE) || exit 1; \
 		else \
 			echo "No Python tests found in ./src/$(SERVICE)."; \
 		fi; \
 		echo "=> Stopping dependencies..."; \
-		cd ./src/$(SERVICE) && $(MAKE) test-deps-down; \
-		cd - > /dev/null; \
+		(cd ./src/$(SERVICE) && $(MAKE) -s test-deps-down) || echo "No test-deps-down for $(SERVICE)"; \
 	else \
 		echo "Running tests for all services..."; \
-		for service in $(SERVICES); do \
+		for service in $(SERVICES); do ( \
 			echo "=> Starting dependencies for $$service..."; \
-			cd ./src/$$service && $(MAKE) test-deps-up; \
-			cd - > /dev/null; \
+			(cd ./src/$$service && $(MAKE) -s test-deps-up) || echo "No test-deps-up for $$service"; \
 			echo "=> Running Go tests for $$service..."; \
 			if find ./src/$$service -type f -name '*.go' | grep -q .; then \
-				go test -v ./src/$$service/...; \
+				go test -v ./src/$$service/... || exit 1; \
 			else \
 				echo "No Go files found in ./src/$$service."; \
 			fi; \
 			echo "=> Running Python tests for $$service..."; \
 			if find ./src/$$service -type f -name '*_test.py' | grep -q .; then \
-				pytest ./src/$$service; \
+				pytest ./src/$$service || exit 1; \
 			else \
 				echo "No Python tests found in ./src/$$service."; \
 			fi; \
 			echo "=> Stopping dependencies for $$service..."; \
-			cd ./src/$$service && $(MAKE) test-deps-down; \
-			cd - > /dev/null; \
-		done; \
+			(cd ./src/$$service && $(MAKE) -s test-deps-down) || echo "No test-deps-down for $$service"; \
+		); done; \
 	fi
 
 .PHONY: help

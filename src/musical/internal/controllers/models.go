@@ -7,9 +7,17 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/TeoPlow/online-music-service/src/musical/internal/models"
+	"github.com/TeoPlow/online-music-service/src/musical/internal/models/dto"
 )
 
-type MusicService interface {
-	AddMusic(context.Context, models.Track) error
-	GetMusic(context.Context, uuid.UUID) (models.Track, error)
+type AlbumService interface {
+	CreateAlbum(context.Context, dto.CreateAlbumRequest) (models.Album, error)
+	UpdateAlbum(context.Context, dto.UpdateAlbumRequest) (models.Album, error)
+	DeleteAlbum(ctx context.Context, id uuid.UUID) error
+	GetAlbum(ctx context.Context, id uuid.UUID) (models.Album, error)
+	ListAlbums(context.Context, dto.ListAlbumsRequest) ([]models.Album, error)
+}
+
+type ArtistService interface {
+	GetArtist(ctx context.Context, id uuid.UUID) (models.Artist, error)
 }
