@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	gomock "go.uber.org/mock/gomock"
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockTxManagerInterface is a mock of TxManagerInterface interface.

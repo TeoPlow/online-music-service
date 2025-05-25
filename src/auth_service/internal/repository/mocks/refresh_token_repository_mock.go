@@ -15,7 +15,7 @@ import (
 	time "time"
 
 	models "github.com/TeoPlow/online-music-service/src/auth_service/internal/models"
-	gomock "go.uber.org/mock/gomock"
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockRefreshTokenRepository is a mock of RefreshTokenRepository interface.

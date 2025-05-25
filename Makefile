@@ -58,40 +58,46 @@ test:
 		echo "Running tests only for $(SERVICE)..."; \
 		echo "=> Starting dependencies for $(SERVICE)..."; \
 		(cd ./src/$(SERVICE) && $(MAKE) -s test-deps-up) || echo "No test-deps-up for $(SERVICE)"; \
+		exit_code=0; \
 		echo "=> Running Go tests..."; \
 		if find ./src/$(SERVICE) -type f -name '*.go' | grep -q .; then \
-			go test -v ./src/$(SERVICE)/... || exit 1; \
+			go test -v ./src/$(SERVICE)/... || exit_code=1; \
 		else \
 			echo "No Go files found in ./src/$(SERVICE)."; \
 		fi; \
 		echo "=> Running Python tests..."; \
 		if find ./src/$(SERVICE) -type f -name '*_test.py' | grep -q .; then \
-			pytest ./src/$(SERVICE) || exit 1; \
+			pytest ./src/$(SERVICE) || exit_code=1; \
 		else \
 			echo "No Python tests found in ./src/$(SERVICE)."; \
 		fi; \
 		echo "=> Stopping dependencies..."; \
 		(cd ./src/$(SERVICE) && $(MAKE) -s test-deps-down) || echo "No test-deps-down for $(SERVICE)"; \
+		exit $$exit_code; \
 	else \
 		echo "Running tests for all services..."; \
-		for service in $(SERVICES); do ( \
+		final_exit_code=0; \
+		for service in $(SERVICES); do { \
+			service_exit_code=0; \
 			echo "=> Starting dependencies for $$service..."; \
 			(cd ./src/$$service && $(MAKE) -s test-deps-up) || echo "No test-deps-up for $$service"; \
 			echo "=> Running Go tests for $$service..."; \
 			if find ./src/$$service -type f -name '*.go' | grep -q .; then \
-				go test -v ./src/$$service/... || exit 1; \
+				go test -v ./src/$$service/... || service_exit_code=1; \
 			else \
 				echo "No Go files found in ./src/$$service."; \
 			fi; \
 			echo "=> Running Python tests for $$service..."; \
 			if find ./src/$$service -type f -name '*_test.py' | grep -q .; then \
-				pytest ./src/$$service || exit 1; \
+				pytest ./src/$$service || service_exit_code=1; \
 			else \
 				echo "No Python tests found in ./src/$$service."; \
 			fi; \
 			echo "=> Stopping dependencies for $$service..."; \
 			(cd ./src/$$service && $(MAKE) -s test-deps-down) || echo "No test-deps-down for $$service"; \
-		); done; \
+			if [ $$service_exit_code -ne 0 ]; then final_exit_code=1; fi \
+		}; done; \
+		exit $$final_exit_code; \
 	fi
 
 .PHONY: help

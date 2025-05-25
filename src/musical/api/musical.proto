@@ -4,25 +4,37 @@ package musical;
 
 option go_package = "github.com/TeoPlow/online-music-service/src/musical/pkg/musicalpb";
 
+import "album.proto";
+import "artist.proto";
+import "like.proto";
+import "track.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/timestamp.proto";
 
-service MusicService {
-  rpc AddMusic(Track) returns (google.protobuf.Empty);
-  rpc GetMusic(IDRequest) returns (Track);
-}
-
-message Track {
-  string id = 1; // UUID
-  string title = 2;
-  string album_id = 3; // UUID
-  string genre = 4;
-  uint32 duration = 5;
-
-  google.protobuf.Timestamp created_at = 6;
-  google.protobuf.Timestamp updated_at = 7;
+service MusicalService {
+    rpc GetArtist (IDRequest) returns (Artist);
+    rpc ListArtists (ListArtistsRequest) returns (ListArtistsResponse);
+    
+    rpc CreateAlbum (CreateAlbumRequest) returns (Album);
+    rpc GetAlbum (IDRequest) returns (Album);
+    rpc UpdateAlbum (UpdateAlbumRequest) returns (Album);
+    rpc DeleteAlbum (IDRequest) returns (google.protobuf.Empty);
+    rpc ListAlbums (ListAlbumsRequest) returns (ListAlbumsResponse);
+    
+    rpc CreateTrack (CreateTrackRequest) returns (Track);
+    rpc GetTrack (IDRequest) returns (Track);
+    rpc UpdateTrack (UpdateTrackRequest) returns (Track);
+    rpc DeleteTrack (IDRequest) returns (google.protobuf.Empty);
+    rpc ListTracks (ListTracksRequest) returns (ListTracksResponse);
+    
+    rpc LikeArtist (LikeArtistRequest) returns (google.protobuf.Empty);
+    rpc UnlikeArtist (UnlikeArtistRequest) returns (google.protobuf.Empty);
+    rpc GetLikedArtists (GetLikedArtistsRequest) returns (GetLikedArtistsResponse);
+    
+    rpc LikeTrack (LikeTrackRequest) returns (google.protobuf.Empty);
+    rpc UnlikeTrack (UnlikeTrackRequest) returns (google.protobuf.Empty);
+    rpc GetLikedTracks (GetLikedTracksRequest) returns (GetLikedTracksResponse);
 }
 
 message IDRequest {
-  string id = 1; // UUID
+  string id = 1;
 }

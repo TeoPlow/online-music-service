@@ -43,7 +43,6 @@ func (c RedisConfig) RedisAddr() string {
 func MustLoad() *Config {
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
-
 		panic("Config path is not set")
 	}
 	if _, err := os.Stat(configPath); err != nil {
