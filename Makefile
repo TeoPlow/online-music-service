@@ -1,4 +1,5 @@
-SERVICES := musical auth_service # Сюда пишем название папки сервиса через пробел
+SERVICES := musical auth_service analysis # Сюда пишем название папки сервиса через пробел
+
 PYENV=python -m 
 
 
@@ -35,6 +36,7 @@ py-lint:
 py-deps:
 	$(PYENV) pip install --upgrade pip
 	$(PYENV) pip install flake8 pytest black
+	$(PYENV) pip install -r requirements.txt
 
 .PHONY: py-fmt
 py-fmt:

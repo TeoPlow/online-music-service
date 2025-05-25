@@ -5,5 +5,10 @@
 bin/
 logs.json
 
-.env
+__pycache__/
 
+.pytest*
+
+config.yml
+config.test.yml
+.env
