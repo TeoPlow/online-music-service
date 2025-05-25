@@ -33,12 +33,11 @@ except FileNotFoundError:
     exit(1)
 
 
-async def send_music_entities(num_iterations=1):
+async def send_musical_entities(num_iterations=1):
     """
     Это функция с запуском фейкового асинхронного Kafka Producer,
     который будет спамить заданное кол-во итераций автосгенерированных
-    пробросов Артистов, Треков, Альбомов, Понравившихся Треков и Артистов
-    по 5 раз каждая.
+    пробросов Артистов, Треков, Альбомов, Понравившихся Треков и Артистов.
     """
     producer = AIOKafkaProducer(
         bootstrap_servers=settings.kafka.bootstrap_servers,
@@ -54,63 +53,62 @@ async def send_music_entities(num_iterations=1):
             liked_artists = []
             liked_tracks = []
 
-            for _ in range(5):
-                artist_id = str(uuid.uuid4())
-                artist = {
-                    "id": artist_id,
-                    "name": fake.name(),
-                    "author": fake.name(),
-                    "producer": fake.name(),
-                    "country": fake.country_code(),
-                    "description": fake.sentence(),
-                    "created_at": datetime.now().isoformat().split(".")[0],
-                    "updated_at": datetime.now().isoformat().split(".")[0],
-                }
-                artists.append(artist)
+            artist_id = str(uuid.uuid4())
+            artist = {
+                "id": artist_id,
+                "name": fake.name(),
+                "author": fake.name(),
+                "producer": fake.name(),
+                "country": fake.country_code(),
+                "description": fake.sentence(),
+                "created_at": datetime.now().isoformat().split(".")[0],
+                "updated_at": datetime.now().isoformat().split(".")[0],
+            }
+            artists.append(artist)
 
-                album_id = str(uuid.uuid4())
-                album = {
-                    "id": album_id,
-                    "title": fake.catch_phrase(),
-                    "artist_id": artist_id,
-                    "release_date": fake.date_this_decade()
-                    .isoformat()
-                    .split(".")[0],
-                }
-                albums.append(album)
+            album_id = str(uuid.uuid4())
+            album = {
+                "id": album_id,
+                "title": fake.catch_phrase(),
+                "artist_id": artist_id,
+                "release_date": fake.date_this_decade()
+                .isoformat()
+                .split(".")[0],
+            }
+            albums.append(album)
 
-                track = {
-                    "id": str(uuid.uuid4()),
-                    "title": fake.sentence(nb_words=3),
-                    "album_id": album_id,
-                    "genre": random.choice(genres),
-                    "duration": random.randint(120, 420),
-                    "lyrics": (
-                        fake.text(max_nb_chars=100)
-                        if random.choice([True, False])
-                        else None
-                    ),
-                    "is_explicit": random.choice([True, False]),
-                    "created_at": datetime.now().isoformat().split(".")[0],
-                    "updated_at": datetime.now().isoformat().split(".")[0],
-                }
-                tracks.append(track)
+            track = {
+                "id": str(uuid.uuid4()),
+                "title": fake.sentence(nb_words=3),
+                "album_id": album_id,
+                "genre": random.choice(genres),
+                "duration": random.randint(120, 420),
+                "lyrics": (
+                    fake.text(max_nb_chars=100)
+                    if random.choice([True, False])
+                    else None
+                ),
+                "is_explicit": random.choice([True, False]),
+                "created_at": datetime.now().isoformat().split(".")[0],
+                "updated_at": datetime.now().isoformat().split(".")[0],
+            }
+            tracks.append(track)
 
-                liked_artist = {
-                    "user_id": str(uuid.uuid4()),
-                    "artist_id": artist_id,
-                    "created_at": datetime.now().isoformat().split(".")[0],
-                }
-                liked_artists.append(liked_artist)
+            liked_artist = {
+                "user_id": str(uuid.uuid4()),
+                "artist_id": artist_id,
+                "created_at": datetime.now().isoformat().split(".")[0],
+            }
+            liked_artists.append(liked_artist)
 
-                liked_track = {
-                    "user_id": str(uuid.uuid4()),
-                    "track_id": track["id"],
-                    "created_at": datetime.now().isoformat().split(".")[0],
-                }
-                liked_tracks.append(liked_track)
+            liked_track = {
+                "user_id": str(uuid.uuid4()),
+                "track_id": track["id"],
+                "created_at": datetime.now().isoformat().split(".")[0],
+            }
+            liked_tracks.append(liked_track)
 
-            # Отправка в Kafka
+            # Отправка данных в Kafka
             for artist in artists:
                 await producer.send(MUSIC_ARTISTS, artist)
                 log.debug(f"[{MUSIC_ARTISTS}] Kafka Sent: {artist}")
@@ -138,7 +136,4 @@ async def send_music_entities(num_iterations=1):
 
     finally:
         await producer.stop()
-
-
-if __name__ == "__main__":
-    asyncio.run(send_music_entities())
+    return artists, albums, tracks, liked_artists, liked_tracks
