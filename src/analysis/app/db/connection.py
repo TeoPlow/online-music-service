@@ -2,9 +2,11 @@ from asyncpg import create_pool
 from app.core.settings import settings
 
 from app.core.logger import get_logger
+
 log = get_logger(__name__)
 
 _db_pool = None
+
 
 async def get_db_client():
     """
@@ -30,8 +32,10 @@ async def connection_check():
 
     client = await get_db_client()
     async with client.acquire() as conn:
-        await conn.execute("""
+        await conn.execute(
+            """
         SELECT 1;
-        """)
+        """
+        )
 
         log.info("Connection is successful.")

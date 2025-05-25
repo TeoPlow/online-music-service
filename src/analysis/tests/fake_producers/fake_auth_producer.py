@@ -11,14 +11,15 @@ from app.kafka.topics import (
 )
 
 from app.core.logger import get_logger
+
 log = get_logger(__name__)
 
 fake = Faker()
 
-roles = ['user', 'admin', 'artist']
+roles = ["user", "admin", "artist"]
 
 
-with open(f'{settings.paths.base_dir}/../static/countries.json', 'r') as f:
+with open(f"{settings.paths.base_dir}/../static/countries.json", "r") as f:
     countries = json.load(f)
 
 
@@ -31,7 +32,7 @@ async def send_auth_user(num_iterations=1):
     users = []
     producer = AIOKafkaProducer(
         bootstrap_servers=settings.kafka.bootstrap_servers,
-        value_serializer=lambda v: json.dumps(v).encode('utf-8')
+        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
     )
     await producer.start()
     try:
@@ -45,7 +46,7 @@ async def send_auth_user(num_iterations=1):
                 "age": random.randint(14, 80),
                 "role": random.choice(roles),
                 "passHash": fake.sha256(),
-                "created_at": datetime.now().isoformat().split('.')[0]
+                "created_at": datetime.now().isoformat().split(".")[0],
             }
             await producer.send(AUTH_USERS, user)
             log.debug(f"[{AUTH_USERS}] Kafka Sent: {user}")

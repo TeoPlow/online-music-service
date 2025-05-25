@@ -4,6 +4,7 @@ from app.db.connection import connection_check
 from app.core.settings import settings
 
 from app.core.logger import get_logger
+
 log = get_logger(__name__)
 
 
@@ -15,30 +16,36 @@ async def main():
                 await connection_check()
                 break
             except Exception:
-                log.warning(f"""
+                log.warning(
+                    f"""
                     Database not ready yet. Retrying in 5 seconds...
                     (Attempt {attempt + 1}/10)
-                """)
+                """
+                )
                 await asyncio.sleep(5)
         else:
-            log.error(f"""
+            log.error(
+                f"""
                 Failed to connect to Database.
                     host={settings.postgres.host},
                     port={settings.postgres.port},
                     user={settings.postgres.user},
                     password=***,
                     database={settings.postgres.database},
-            """)
+            """
+            )
 
         for attempt in range(10):
             try:
                 await consume()
                 break
             except Exception:
-                log.warning(f"""
+                log.warning(
+                    f"""
                     Kafka not ready yet. Retrying in 5 seconds...
                     (Attempt {attempt + 1}/10)
-                """)
+                """
+                )
                 await asyncio.sleep(5)
         else:
             log.error("Failed to connect to Kafka.")

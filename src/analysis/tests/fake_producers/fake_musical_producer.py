@@ -12,19 +12,20 @@ from app.kafka.topics import (
     MUSIC_ALBUMS,
     MUSIC_TRACKS,
     MUSIC_LIKED_TRACKS,
-    MUSIC_LIKED_ARTISTS
+    MUSIC_LIKED_ARTISTS,
 )
 
 from app.core.settings import settings
 
 from app.core.logger import get_logger
+
 log = get_logger(__name__)
 fake = Faker()
 
 log.info("[musical] Started async fake musical producer.")
 
 try:
-    with open('../static/genres.json', 'r') as f:
+    with open("../static/genres.json", "r") as f:
         genres = json.load(f)
 except FileNotFoundError:
     log.error(f"File {os.getcwd()}/../static/genres.json not found.")
@@ -41,7 +42,7 @@ async def send_music_entities(num_iterations=1):
     """
     producer = AIOKafkaProducer(
         bootstrap_servers=settings.kafka.bootstrap_servers,
-        value_serializer=lambda v: json.dumps(v).encode('utf-8')
+        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
     )
     await producer.start()
 
@@ -62,8 +63,8 @@ async def send_music_entities(num_iterations=1):
                     "producer": fake.name(),
                     "country": fake.country_code(),
                     "description": fake.sentence(),
-                    "created_at": datetime.now().isoformat().split('.')[0],
-                    "updated_at": datetime.now().isoformat().split('.')[0]
+                    "created_at": datetime.now().isoformat().split(".")[0],
+                    "updated_at": datetime.now().isoformat().split(".")[0],
                 }
                 artists.append(artist)
 
@@ -72,8 +73,9 @@ async def send_music_entities(num_iterations=1):
                     "id": album_id,
                     "title": fake.catch_phrase(),
                     "artist_id": artist_id,
-                    "release_date": fake.date_this_decade().isoformat()
-                                        .split('.')[0]
+                    "release_date": fake.date_this_decade()
+                    .isoformat()
+                    .split(".")[0],
                 }
                 albums.append(album)
 
@@ -83,26 +85,28 @@ async def send_music_entities(num_iterations=1):
                     "album_id": album_id,
                     "genre": random.choice(genres),
                     "duration": random.randint(120, 420),
-                    "lyrics": fake.text(max_nb_chars=100) if random.choice(
-                                                                [True, False]
-                                                             ) else None,
+                    "lyrics": (
+                        fake.text(max_nb_chars=100)
+                        if random.choice([True, False])
+                        else None
+                    ),
                     "is_explicit": random.choice([True, False]),
-                    "created_at": datetime.now().isoformat().split('.')[0],
-                    "updated_at": datetime.now().isoformat().split('.')[0]
+                    "created_at": datetime.now().isoformat().split(".")[0],
+                    "updated_at": datetime.now().isoformat().split(".")[0],
                 }
                 tracks.append(track)
 
                 liked_artist = {
                     "user_id": str(uuid.uuid4()),
                     "artist_id": artist_id,
-                    "created_at": datetime.now().isoformat().split('.')[0]
+                    "created_at": datetime.now().isoformat().split(".")[0],
                 }
                 liked_artists.append(liked_artist)
 
                 liked_track = {
                     "user_id": str(uuid.uuid4()),
                     "track_id": track["id"],
-                    "created_at": datetime.now().isoformat().split('.')[0]
+                    "created_at": datetime.now().isoformat().split(".")[0],
                 }
                 liked_tracks.append(liked_track)
 
@@ -136,5 +140,5 @@ async def send_music_entities(num_iterations=1):
         await producer.stop()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(send_music_entities())

@@ -7,7 +7,7 @@ from app.core.settings import settings
 
 
 @pytest.mark.asyncio
-async def test_one_message_to_consumer():
+async def test_one_message_to_consumer(db_pool):
     """
     Отправляет пользовательские данные в Kafka и проверяет,
     были ли они успешно вставлены в Database через Kafka Consumer.
@@ -26,7 +26,9 @@ async def test_one_message_to_consumer():
 
     await asyncio.sleep(5)
 
-    retrieved_user: User = await User.get_latest_by_id(user["id"])
+    retrieved_user: User = await User.get_latest_by_id(
+        user["id"], pool=db_pool
+    )
     print(f"Retrieved user: {retrieved_user}")
 
     assert retrieved_user is not None
@@ -37,13 +39,13 @@ async def test_one_message_to_consumer():
         assert False is user["gender"]
     assert retrieved_user.age == user["age"]
 
-    date = retrieved_user.created_at.strftime('%Y-%m-%dT%H:%M:%S')
+    date = retrieved_user.created_at.strftime("%Y-%m-%dT%H:%M:%S")
     assert date == user["created_at"]
     assert retrieved_user.country == user["country"]
 
 
 @pytest.mark.asyncio
-async def test_multiple_messages_to_consumer():
+async def test_multiple_messages_to_consumer(db_pool):
     """
     Отправляет несколько пользовательских данных в Kafka и проверяет,
     были ли они успешно вставлены в Database через Kafka Consumer.
@@ -52,7 +54,9 @@ async def test_multiple_messages_to_consumer():
     await asyncio.sleep(5)
 
     for user in users:
-        retrieved_user: User = await User.get_latest_by_id(user["id"])
+        retrieved_user: User = await User.get_latest_by_id(
+            user["id"], pool=db_pool
+        )
         print(f"Retrieved user: {retrieved_user}")
         assert retrieved_user is not None
         assert str(retrieved_user.id) == user["id"]
@@ -62,8 +66,7 @@ async def test_multiple_messages_to_consumer():
             assert False is user["gender"]
         assert retrieved_user.age == user["age"]
 
-        # Миллисекунды Database не хранит (вроде)
-        date = retrieved_user.created_at.strftime('%Y-%m-%dT%H:%M:%S')
+        date = retrieved_user.created_at.strftime("%Y-%m-%dT%H:%M:%S")
         assert date == user["created_at"]
         assert retrieved_user.country == user["country"]
 

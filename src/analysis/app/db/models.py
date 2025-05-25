@@ -2,9 +2,9 @@ from uuid import UUID
 from datetime import date, datetime
 from typing import Optional
 from pydantic import BaseModel
-from app.db.connection import get_db_client
 
 from app.core.logger import get_logger
+
 log = get_logger(__name__)
 
 
@@ -19,14 +19,10 @@ class User(BaseModel):
     updated_at: datetime
 
     @staticmethod
-    async def get_latest_by_id(user_id: UUID) -> Optional["User"]:
-        """
-        Возвращает последнего добавленного в БД пользователя с переданным UUID.
-        """
+    async def get_latest_by_id(user_id: UUID, pool) -> Optional["User"]:
         log.info(f"Fetching latest user by ID: {user_id}")
 
-        client = await get_db_client()
-        async with client.acquire() as conn:
+        async with pool.acquire() as conn:
             query = """
                 SELECT * FROM music_streaming.users
                 WHERE id = $1
@@ -46,7 +42,7 @@ class User(BaseModel):
             age=row["age"],
             role=row["role"],
             created_at=row["created_at"],
-            updated_at=row["updated_at"]
+            updated_at=row["updated_at"],
         )
 
 
@@ -81,14 +77,13 @@ class Artist(BaseModel):
     updated_at: datetime
 
     @staticmethod
-    async def get_latest_by_id(artist_id: UUID) -> Optional["Artist"]:
+    async def get_latest_by_id(artist_id: UUID, pool) -> Optional["Artist"]:
         """
         Возвращает последнего добавленного в БД артиста с переданным UUID.
         """
         log.info(f"Fetching latest artist by ID: {artist_id}")
 
-        client = await get_db_client()
-        async with client.acquire() as conn:
+        async with pool.acquire() as conn:
             query = """
                 SELECT * FROM music_streaming.artists
                 WHERE id = $1
@@ -108,7 +103,7 @@ class Artist(BaseModel):
             country=row["country"],
             description=row["description"],
             created_at=row["created_at"],
-            updated_at=row["updated_at"]
+            updated_at=row["updated_at"],
         )
 
 

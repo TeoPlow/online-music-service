@@ -8,7 +8,7 @@ from app.kafka.handlers import (
     handle_music_albums,
     handle_music_tracks,
     handler_music_liked_tracks,
-    handler_music_liked_artists
+    handler_music_liked_artists,
 )
 from app.kafka.topics import (
     AUTH_USERS,
@@ -16,12 +16,13 @@ from app.kafka.topics import (
     MUSIC_ALBUMS,
     MUSIC_TRACKS,
     MUSIC_LIKED_TRACKS,
-    MUSIC_LIKED_ARTISTS
+    MUSIC_LIKED_ARTISTS,
 )
 
 from app.core.settings import settings
 
 from app.core.logger import get_logger
+
 log = get_logger(__name__)
 
 TOPIC_HANDLERS = {
