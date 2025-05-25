@@ -12,6 +12,7 @@ class ColoredFormatter(logging.Formatter):
 
     Не работают в docker logs :(
     """
+
     COLORS = {
         logging.DEBUG: colorama.Fore.WHITE,
         logging.INFO: colorama.Fore.CYAN,
@@ -33,20 +34,19 @@ def configure_logger():
     """
     colorama.init()
 
-    format_str = "(%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d - " \
-                 "%(message)s)"
+    format_str = (
+        "(%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d - "
+        "%(message)s)"
+    )
     datefmt = "%Y-%m-%dT%H:%M:%S"
 
     formatters = {
         "console": {
             "()": ColoredFormatter,
             "format": format_str,
-            "datefmt": datefmt
+            "datefmt": datefmt,
         },
-        "file": {
-            "format": format_str,
-            "datefmt": datefmt
-        }
+        "file": {"format": format_str, "datefmt": datefmt},
     }
 
     handlers = {
@@ -54,7 +54,7 @@ def configure_logger():
             "class": "logging.StreamHandler",
             "formatter": "console",
             "stream": sys.stdout,
-            "level": settings.log.level
+            "level": settings.log.level,
         }
     }
 
@@ -63,7 +63,7 @@ def configure_logger():
             "class": "logging.FileHandler",
             "formatter": "file",
             "filename": "logfile.log",
-            "level": settings.log.level
+            "level": settings.log.level,
         }
 
     logger_config = {
@@ -75,9 +75,9 @@ def configure_logger():
             "": {
                 "handlers": list(handlers.keys()),
                 "level": settings.log.level,
-                "propagate": False
+                "propagate": False,
             }
-        }
+        },
     }
 
     logging.config.dictConfig(logger_config)

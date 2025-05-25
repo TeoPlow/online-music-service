@@ -28,7 +28,7 @@ class KafkaConfig(BaseSettings):
         "music-albums",
         "music-tracks",
         "music-liked-artists",
-        "music-liked-tracks"
+        "music-liked-tracks",
     ]
 
 
@@ -50,10 +50,7 @@ class Settings(BaseSettings):
     kafka: KafkaConfig = KafkaConfig()
     postgres: PostgresConfig = PostgresConfig()
 
-    model_config = ConfigDict(
-        env_nested_delimiter="__",
-        case_sensitive=False
-    )
+    model_config = ConfigDict(env_nested_delimiter="__", case_sensitive=False)
 
 
 yaml_config = load_yaml_config()
