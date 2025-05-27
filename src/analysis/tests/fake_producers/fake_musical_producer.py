@@ -13,6 +13,7 @@ from app.kafka.topics import (
     MUSIC_TRACKS,
     MUSIC_LIKED_TRACKS,
     MUSIC_LIKED_ARTISTS,
+    AUTH_USERS,
 )
 
 from app.core.settings import settings
@@ -46,6 +47,27 @@ async def send_musical_entities(num_iterations=1):
     await producer.start()
 
     try:
+        # Создаю одного тестового пользователя.
+        with open(
+            f"{settings.paths.base_dir}/../static/countries.json", "r"
+        ) as f:
+            countries = json.load(f)
+        roles = ["user", "admin", "artist"]
+
+        user_id = str(uuid.uuid4())
+        user = {
+            "id": user_id,
+            "username": fake.user_name(),
+            "email": fake.email(),
+            "gender": random.choice([True, False]),
+            "country": random.choice(countries),
+            "age": random.randint(14, 80),
+            "role": random.choice(roles),
+            "passHash": fake.sha256(),
+            "created_at": datetime.now().isoformat().split(".")[0],
+        }
+        await producer.send(AUTH_USERS, user)
+
         for _ in range(num_iterations):
             artists = []
             albums = []
@@ -95,14 +117,14 @@ async def send_musical_entities(num_iterations=1):
             tracks.append(track)
 
             liked_artist = {
-                "user_id": str(uuid.uuid4()),
+                "user_id": user_id,
                 "artist_id": artist_id,
                 "created_at": datetime.now().isoformat().split(".")[0],
             }
             liked_artists.append(liked_artist)
 
             liked_track = {
-                "user_id": str(uuid.uuid4()),
+                "user_id": user_id,
                 "track_id": track["id"],
                 "created_at": datetime.now().isoformat().split(".")[0],
             }
@@ -122,7 +144,7 @@ async def send_musical_entities(num_iterations=1):
             for track in tracks:
                 await producer.send(MUSIC_TRACKS, track)
                 log.debug(f"[{MUSIC_TRACKS}] Kafka Sent: {track}")
-                await asyncio.sleep(random.uniform(2, 5))
+                await asyncio.sleep(0.5)
 
             for liked_artist in liked_artists:
                 await producer.send(MUSIC_LIKED_ARTISTS, liked_artist)

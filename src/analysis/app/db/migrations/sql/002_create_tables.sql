@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS music_streaming.tracks (
             duration INTEGER,
             lyrics TEXT,
             is_explicit BOOLEAN,
-            published_at TIMESTAMP,
+            created_at TIMESTAMP,
             updated_at TIMESTAMP
         );
 

@@ -11,9 +11,9 @@ log = get_logger(__name__)
 class User(BaseModel):
     id: UUID
     username: str
-    gender: str
-    country: str
-    age: int
+    gender: Optional[str]
+    country: Optional[str]
+    age: Optional[int]
     role: str
     created_at: datetime
     updated_at: datetime
@@ -50,11 +50,11 @@ class Track(BaseModel):
     id: UUID
     title: str
     album_id: UUID
-    genre: str
-    duration: int
-    lyrics: str
+    genre: Optional[str]
+    duration: Optional[int]
+    lyrics: Optional[str]
     is_explicit: bool
-    published_at: datetime
+    created_at: datetime
     updated_at: datetime
 
     @staticmethod
@@ -81,7 +81,7 @@ class Track(BaseModel):
             duration=row["duration"],
             lyrics=row["lyrics"],
             is_explicit=row["is_explicit"],
-            published_at=row["published_at"],
+            created_at=row["created_at"],
             updated_at=row["updated_at"],
         )
 
@@ -190,16 +190,21 @@ class Event(BaseModel):
 class LikedArtist(BaseModel):
     user_id: UUID
     artist_id: UUID
-    created_at: datetime
 
     @staticmethod
-    async def get_latest_by_user_artist(user_id: UUID, artist_id: UUID, pool) -> Optional["LikedArtist"]:
+    async def get_latest_by_user_artist(
+        user_id: UUID, artist_id: UUID, pool
+    ) -> Optional["LikedArtist"]:
         async with pool.acquire() as conn:
-            result = await conn.fetchrow("""
+            result = await conn.fetchrow(
+                """
                 SELECT * FROM music_streaming.liked_artists
                 WHERE user_id = $1 AND artist_id = $2
-                ORDER BY created_at DESC LIMIT 1
-            """, user_id, artist_id)
+                LIMIT 1
+            """,
+                user_id,
+                artist_id,
+            )
         if not result:
             return None
         return LikedArtist(**result)
@@ -208,16 +213,21 @@ class LikedArtist(BaseModel):
 class LikedTrack(BaseModel):
     user_id: UUID
     track_id: UUID
-    created_at: datetime
 
     @staticmethod
-    async def get_latest_by_user_track(user_id: UUID, track_id: UUID, pool) -> Optional["LikedTrack"]:
+    async def get_latest_by_user_track(
+        user_id: UUID, track_id: UUID, pool
+    ) -> Optional["LikedTrack"]:
         async with pool.acquire() as conn:
-            result = await conn.fetchrow("""
+            result = await conn.fetchrow(
+                """
                 SELECT * FROM music_streaming.liked_tracks
                 WHERE user_id = $1 AND track_id = $2
-                ORDER BY created_at DESC LIMIT 1
-            """, user_id, track_id)
+                LIMIT 1
+            """,
+                user_id,
+                track_id,
+            )
         if not result:
             return None
         return LikedTrack(**result)
