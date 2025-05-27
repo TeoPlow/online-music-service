@@ -121,6 +121,7 @@ linters-settings:
             - "golang.org/x/crypto/bcrypt"
             # grpc
             - "google.golang.org/grpc"
+            - "google.golang.org/protobuf/types/known/timestamppb"
             # redis
             - "github.com/redis/go-redis/v9"
             #internal packages
