@@ -70,12 +70,9 @@ async def handler_music_liked_tracks(message: dict):
     try:
         client = await get_db_client()
 
-        user_id = UUID(message["user_id"])
-        new_track_id = UUID(message["track_id"])
-
         liked_track = LikedTrack(
-            user_id=user_id,
-            track_id=new_track_id,
+            user_id=UUID(message["user_id"]),
+            track_id=UUID(message["track_id"]),
         )
 
         async with client.acquire() as conn:
@@ -98,12 +95,9 @@ async def handler_music_liked_artists(message: dict):
     try:
         client = await get_db_client()
 
-        user_id = UUID(message["user_id"])
-        new_artist_id = UUID(message["artist_id"])
-
         liked_artist = LikedArtist(
-            user_id=user_id,
-            artist_id=new_artist_id,
+            user_id=UUID(message["user_id"]),
+            artist_id=UUID(message["artist_id"]),
         )
 
         async with client.acquire() as conn:
@@ -216,7 +210,7 @@ async def handle_music_tracks(message: dict):
             duration=message["duration"],
             lyrics=message["lyrics"],
             is_explicit=message["is_explicit"],
-            published_at=message["published_at"],
+            created_at=message["created_at"],
             updated_at=datetime.now(),
         )
 
@@ -225,7 +219,7 @@ async def handle_music_tracks(message: dict):
                 """
                 INSERT INTO music_streaming.tracks
                 (id, title, album_id, genre, duration,
-                lyrics, is_explicit, published_at, updated_at)
+                lyrics, is_explicit, created_at, updated_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 ON CONFLICT (id) DO UPDATE SET
                 title = EXCLUDED.title,
@@ -234,7 +228,7 @@ async def handle_music_tracks(message: dict):
                 duration = EXCLUDED.duration,
                 lyrics = EXCLUDED.lyrics,
                 is_explicit = EXCLUDED.is_explicit,
-                published_at = EXCLUDED.published_at,
+                created_at = EXCLUDED.created_at,
                 updated_at = EXCLUDED.updated_at
                 """,
                 track.id,
@@ -244,7 +238,7 @@ async def handle_music_tracks(message: dict):
                 track.duration,
                 track.lyrics,
                 track.is_explicit,
-                track.published_at,
+                track.created_at,
                 track.updated_at,
             )
 
