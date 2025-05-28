@@ -126,7 +126,7 @@ func protoFromTrack(t models.Track) *pb.Track {
 	}
 }
 
-func protoToCreateTrackRequest(p *pb.CreateTrackRequest) (dto.CreateTrackRequest, error) {
+func protoToCreateTrackRequest(p *pb.TrackInfo) (dto.CreateTrackRequest, error) {
 	albumID, err := uuid.Parse(p.GetAlbumId())
 	if err != nil {
 		return dto.CreateTrackRequest{}, err

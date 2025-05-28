@@ -68,6 +68,7 @@ gen-mock:
 	mockgen -destination=tests/mocks/track_repo_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain TrackRepo
 	mockgen -destination=tests/mocks/artist_service_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain ArtistClient
 	mockgen -destination=tests/mocks/album_service_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain AlbumClient
+	mockgen -destination=tests/mocks/streaming_service_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain StreamingClient
 	mockgen -destination=tests/mocks/tx_manager_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain TxManager
 
 # for tests

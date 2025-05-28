@@ -3,3 +3,9 @@ grpc_port: :8000
 
 log:
   level: info
+
+minio:
+  endpoint: "localhost:9000"
+  access: "minioadmin"
+  secret: "minioadmin123"
+  ssl: false
