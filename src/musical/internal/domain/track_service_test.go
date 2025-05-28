@@ -1,6 +1,7 @@
 package domain_test
 
 import (
+	"bytes"
 	"context"
 	"testing"
 	"time"
@@ -43,6 +44,7 @@ func TestCreateTrack(t *testing.T) {
 		repoFindRes bool
 		repoAddErr  error
 		clientErr   error
+		streamerErr error
 		wantErr     error
 	}{
 		{
@@ -68,16 +70,23 @@ func TestCreateTrack(t *testing.T) {
 			repoAddErr: storage.ErrSQL,
 			wantErr:    domain.ErrInternal,
 		},
+		{
+			name:        "minio error",
+			streamerErr: domain.ErrInternal,
+			wantErr:     domain.ErrInternal,
+		},
 	}
 
 	ctrl := gomock.NewController(t)
 	mockRepo := mocks.NewMockTrackRepo(ctrl)
 	mockTxm := mocks.NewMockTxManager(ctrl)
 	mockClient := mocks.NewMockAlbumClient(ctrl)
+	mockStreamer := mocks.NewMockStreamingClient(ctrl)
 	service := domain.NewTrackService(
 		mockRepo,
 		mockTxm,
 		mockClient,
+		mockStreamer,
 	)
 
 	mockTxm.EXPECT().RunSerializable(
@@ -90,13 +99,20 @@ func TestCreateTrack(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo.EXPECT().FindCopy(gomock.Any(), gomock.Any()).Return(tt.repoFindRes, nil)
 			if !tt.repoFindRes {
+				mockClient.EXPECT().GetAlbum(gomock.Any(), model.AlbumID).Return(models.Album{}, tt.clientErr)
 				if tt.clientErr == nil {
 					mockRepo.EXPECT().Add(gomock.Any(), gomock.Any()).Return(tt.repoAddErr)
+					if tt.repoAddErr == nil {
+						mockStreamer.EXPECT().SaveTrack(gomock.Any(), gomock.Any(),
+							gomock.Any()).DoAndReturn(func(arg1, arg2 any, buf *bytes.Buffer) error {
+							assert.Equal(t, "meow", buf.String())
+							return tt.streamerErr
+						})
+					}
 				}
-				mockClient.EXPECT().GetAlbum(gomock.Any(), model.AlbumID).Return(models.Album{}, tt.clientErr)
 			}
 
-			res, err := service.CreateTrack(t.Context(), req)
+			res, err := service.CreateTrack(t.Context(), req, bytes.NewBuffer([]byte("meow")))
 
 			assert.ErrorIs(t, err, tt.wantErr)
 
@@ -197,6 +213,7 @@ func TestUpdateTrack(t *testing.T) {
 		mockRepo,
 		mockTxm,
 		mockClient,
+		mocks.NewMockStreamingClient(ctrl),
 	)
 
 	mockTxm.EXPECT().RunSerializable(
@@ -297,6 +314,7 @@ func TestGetTrack(t *testing.T) {
 		mockRepo,
 		mocks.NewMockTxManager(ctrl),
 		mocks.NewMockAlbumClient(ctrl),
+		mocks.NewMockStreamingClient(ctrl),
 	)
 
 	for _, tt := range tests {
@@ -342,16 +360,28 @@ func TestDeleteTrack(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	mockRepo := mocks.NewMockTrackRepo(ctrl)
+	mockTxm := mocks.NewMockTxManager(ctrl)
+	mockStreamer := mocks.NewMockStreamingClient(ctrl)
 	service := domain.NewTrackService(
 		mockRepo,
-		mocks.NewMockTxManager(ctrl),
+		mockTxm,
 		mocks.NewMockAlbumClient(ctrl),
+		mockStreamer,
 	)
+
+	mockTxm.EXPECT().RunReadUncommited(
+		gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, f func(context.Context) error) error {
+			return f(ctx)
+		}).AnyTimes()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			id := uuid.New()
 			mockRepo.EXPECT().Delete(gomock.Any(), id).Return(tt.repoErr)
+			if tt.repoErr == nil {
+				mockStreamer.EXPECT().DeleteTrack(gomock.Any(), id)
+			}
 
 			err := service.DeleteTrack(t.Context(), id)
 			switch tt.repoErr {

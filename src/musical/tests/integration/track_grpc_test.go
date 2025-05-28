@@ -116,12 +116,12 @@ func (ts *TrackServiceTest) TearDownTest() {
 func (ts *TrackServiceTest) TestCreateTrack() {
 	tests := []struct {
 		name     string
-		req      *pb.CreateTrackRequest
+		req      *pb.TrackInfo
 		wantCode codes.Code
 	}{
 		{
 			name: "success",
-			req: &pb.CreateTrackRequest{
+			req: &pb.TrackInfo{
 				Title:   "test_track 6",
 				AlbumId: "11111111-1111-1111-1111-111111111111",
 			},
@@ -129,7 +129,7 @@ func (ts *TrackServiceTest) TestCreateTrack() {
 		},
 		{
 			name: "already exists",
-			req: &pb.CreateTrackRequest{
+			req: &pb.TrackInfo{
 				Title:      "Never Gonna Give You Up",
 				AlbumId:    "11111111-1111-1111-1111-111111111111",
 				Genre:      "pop",
@@ -141,7 +141,7 @@ func (ts *TrackServiceTest) TestCreateTrack() {
 		},
 		{
 			name: "no album",
-			req: &pb.CreateTrackRequest{
+			req: &pb.TrackInfo{
 				Title:   "test_track 7",
 				AlbumId: "30a1415e-1287-44bd-b856-78bb21b1375c",
 				Genre:   "classic",
@@ -150,7 +150,7 @@ func (ts *TrackServiceTest) TestCreateTrack() {
 		},
 		{
 			name: "invalid uuid",
-			req: &pb.CreateTrackRequest{
+			req: &pb.TrackInfo{
 				Title:   "test_ablum 8",
 				AlbumId: "i'm uuid",
 				Genre:   "classic",
@@ -161,7 +161,17 @@ func (ts *TrackServiceTest) TestCreateTrack() {
 
 	for _, tt := range tests {
 		ts.T().Run(tt.name, func(t *testing.T) {
-			res, err := ts.Client.CreateTrack(ts.T().Context(), tt.req)
+			stream, err := ts.Client.CreateTrack(ts.T().Context())
+			ts.Require().NoError(err)
+
+			err = stream.Send(&pb.CreateTrackRequest{
+				Data: &pb.CreateTrackRequest_Metadata{
+					Metadata: tt.req,
+				},
+			})
+			ts.Require().NoError(err)
+
+			res, err := stream.CloseAndRecv()
 			if err != nil {
 				st, ok := status.FromError(err)
 				ts.Require().True(ok)
