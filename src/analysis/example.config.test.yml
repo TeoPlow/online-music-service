@@ -18,8 +18,8 @@ kafka:
     - music-liked-tracks
 
 postgres:
-  host: localhost
-  port: 9000
-  user: default # Не пашет 
-  password: "mysecurepassword"
-  database: music_streaming
+  host: postgres
+  port: 5433
+  user: default # Не пашет
+  password: password
+  database: analysis_db

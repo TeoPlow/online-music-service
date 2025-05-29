@@ -1,0 +1,118 @@
+# Основной docker-compose для запуска всего проекта.
+
+services:
+
+  # PostgreSQL (один на все сервисы)
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: default_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  # Redis для Auth
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  # Zookeeper для Kafka, как центральный сервер координации.
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - backend
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.2.1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092" # Доступ изнутри докера
+      - "9094:9094" # Доступ снаружи
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - backend
+
+  # Envoy, работает в качестве API Gateway
+  envoy:
+    image: envoyproxy/envoy:v1.29-latest
+    ports:
+      - "8080:8080"
+      - "9901:9901" 
+    volumes:
+      - ./src/envoy/envoy.yaml:/etc/envoy/envoy.yaml
+    networks:
+      - backend
+
+  # # Auth Service
+  # auth:
+  #   build:
+  #     context: .
+  #     dockerfile: src/auth_service/Dockerfile
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   environment:
+  #     DB_URL: postgres://user:password@postgres:5432/auth_db
+  #   networks:
+  #     - backend
+
+  # # Musical Service
+  # musical:
+  #   build:
+  #     context: .
+  #     dockerfile: src/musical/Dockerfile
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     DB_URL: postgres://user:password@postgres:5432/musical_db
+  #   networks:
+  #     - backend
+
+  # Analysis Service
+  analysis:
+    build:
+      context: .
+      dockerfile: src/analysis/Dockerfile
+    command: python app/main.py
+    depends_on:
+      - kafka
+      - postgres
+    volumes:
+      - ./src/analysis/:/app
+    environment:
+      DB_URL: postgres://user:password@postgres:5432/analysis_db
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:

@@ -1,6 +1,6 @@
 env: local
 
-db_url: postgres://testuser:testpass@localhost:5432/auth_db?sslmode=disable
+db_url: postgres://user:password@postgres:5432/auth_db?sslmode=disable
   
 access_token_ttl: 1h
 refresh_token_ttl: 24h
@@ -13,7 +13,7 @@ jwt_secret: "secret"
 
 redis:
   host: localhost
-  port: 6379
+  port: 6378
   password: ""
   db: 0
   dial_timeout: 5s

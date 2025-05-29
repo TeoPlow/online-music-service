@@ -3,7 +3,7 @@ include ../../Makefile
 CONFIG_PATH=./config/config.yaml
 COMPOSE_PATH=./config/docker-compose.yml
 MIGRATIONS_DIR=./migrations
-DB_URL=postgres://testuser:testpass@localhost:5432/auth_db
+DB_URL=postgres://testuser:testpass@localhost:5433/auth_db
 
 .PHONY: build
 build: gen-pb

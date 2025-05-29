@@ -21,6 +21,7 @@ go-deps:
 	go install github.com/golang/mock/mockgen@latest
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
 	go mod tidy
 
 .PHONY: go-fmt

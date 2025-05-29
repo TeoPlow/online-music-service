@@ -35,9 +35,9 @@ class KafkaConfig(BaseSettings):
 class PostgresConfig(BaseSettings):
     host: str = Field(default_factory=lambda: db_host)
     port: int = 5433 if env == "test" else 5432
-    user: str = "postgres"
-    password: str = "mypassword"
-    database: str = "music_streaming"
+    user: str = "user"
+    password: str = "password"
+    database: str = "analysis_db"
 
 
 class AppConfig(BaseSettings):

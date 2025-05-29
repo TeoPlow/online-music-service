@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS music_streaming;
+
 CREATE TABLE IF NOT EXISTS music_streaming.users (
             id UUID PRIMARY KEY,
             username TEXT,

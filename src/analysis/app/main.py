@@ -30,7 +30,7 @@ async def main():
                     host={settings.postgres.host},
                     port={settings.postgres.port},
                     user={settings.postgres.user},
-                    password=***,
+                    password={settings.postgres.password},
                     database={settings.postgres.database},
             """
             )
