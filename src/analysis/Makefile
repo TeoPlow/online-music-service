@@ -3,6 +3,7 @@ include ../../Makefile
 CONFIG_PATH=./config.yml
 COMPOSE_PATH=./docker-compose.yml
 TESTS_PATH=./tests
+SUPERSET_COMPOSE_PATH=./superset/docker-compose-image-tag.yml
 
 .PHONY: setup-venv start-services stop-services remove-volumes postgres-shell
 
@@ -15,6 +16,8 @@ create-network:
 start-services:
 	@echo "Starting services..."
 	docker compose -f ${COMPOSE_PATH} up --build -d
+	@echo "Starting Superset services..."
+	docker compose -f ${SUPERSET_COMPOSE_PATH} up --build -d
 
 start-services+:
 	@echo "Starting services..."
