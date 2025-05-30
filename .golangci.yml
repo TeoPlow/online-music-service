@@ -52,6 +52,9 @@ linters-settings:
         files:
           - "**/cmd/**"
         allow:
+          - time
+          - os
+          - syscall
           - context
           - flag
           - log
@@ -60,10 +63,27 @@ linters-settings:
           - syscall
           - github.com/joho/godotenv 
           - "github.com/TeoPlow/online-music-service"
+      testing:
+        list-mode: strict
+        files:
+          - "**/*_test.go"
+        allow:
+          - $gostd
+          - "github.com/stretchr/testify"
+          - "github.com/golang/mock/gomock"
+          - "github.com/google/uuid"
+          - "google.golang.org/grpc"
+          - "github.com/TeoPlow/online-music-service"
+          # for auth
+          - "github.com/golang-jwt/jwt"
+          - "github.com/jackc/pgx"
+          - "golang.org/x/crypto/bcrypt"
+          - "github.com/redis/go-redis"
       musical-internal:
         list-mode: strict
         files:
           - "**/musical/internal/**"
+          - "!**/*_test.go"
         allow:
           # std
           - $gostd
@@ -77,6 +97,8 @@ linters-settings:
           # for postgres
           - "github.com/jackc"
           - "github.com/georgysavva/scany/pgxscan"
+          # for minio
+          - "github.com/minio/minio-go/v7"
           # internal packages
           - "github.com/TeoPlow/online-music-service/src/musical/internal"
           - "github.com/TeoPlow/online-music-service/src/musical/pkg"
@@ -84,8 +106,8 @@ linters-settings:
         list-mode: strict
         files:
           - "**/auth_service/internal/**"
-          - "**/auth_service/auth_test/**"
           - "**/auth_service/**/*.go"
+          - "!**/*_test.go"
         allow:
             # std
             - $gostd
@@ -94,9 +116,6 @@ linters-settings:
             - "github.com/jackc/pgx/v5"
             - "github.com/georgysavva/scany/pgxscan"
             - "time"
-            # test
-            - "go.uber.org/mock/gomock"
-            - "github.com/stretchr/testify"
             #env
             - "github.com/joho/godotenv"
             - "github.com/ilyakaznacheev/cleanenv"
@@ -107,6 +126,8 @@ linters-settings:
             - "google.golang.org/protobuf/types/known/timestamppb"
             # redis
             - "github.com/redis/go-redis/v9"
+            # kafka
+            - "github.com/IBM/sarama"
             #internal packages
             - "github.com/TeoPlow/online-music-service/src/auth_service"
         
@@ -117,6 +138,7 @@ linters-settings:
           - "!**/cmd/**"
           - "!**/musical/**"
           - "!**/auth_service/**"
+          - "!**/*_test.go"
         allow:
           - $gostd
     
