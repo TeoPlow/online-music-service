@@ -1,4 +1,5 @@
-SERVICES := musical auth_service # Сюда пишем название папки сервиса через пробел
+SERVICES := musical auth_service analysis # Сюда пишем название папки сервиса через пробел
+
 PYENV=python -m 
 
 
@@ -35,6 +36,7 @@ py-lint:
 py-deps:
 	$(PYENV) pip install --upgrade pip
 	$(PYENV) pip install flake8 pytest black
+	$(PYENV) pip install -r requirements.txt
 
 .PHONY: py-fmt
 py-fmt:
@@ -55,45 +57,47 @@ test:
 	@if [ -n "$(SERVICE)" ]; then \
 		echo "Running tests only for $(SERVICE)..."; \
 		echo "=> Starting dependencies for $(SERVICE)..."; \
-		cd ./src/$(SERVICE) && $(MAKE) test-deps-up; \
-		cd - > /dev/null; \
+		(cd ./src/$(SERVICE) && $(MAKE) -s test-deps-up) || echo "No test-deps-up for $(SERVICE)"; \
+		exit_code=0; \
 		echo "=> Running Go tests..."; \
 		if find ./src/$(SERVICE) -type f -name '*.go' | grep -q .; then \
-			go test -v ./src/$(SERVICE)/...; \
+			go test -v ./src/$(SERVICE)/... || exit_code=1; \
 		else \
 			echo "No Go files found in ./src/$(SERVICE)."; \
 		fi; \
 		echo "=> Running Python tests..."; \
 		if find ./src/$(SERVICE) -type f -name '*_test.py' | grep -q .; then \
-			pytest ./src/$(SERVICE); \
+			pytest ./src/$(SERVICE) || exit_code=1; \
 		else \
 			echo "No Python tests found in ./src/$(SERVICE)."; \
 		fi; \
 		echo "=> Stopping dependencies..."; \
-		cd ./src/$(SERVICE) && $(MAKE) test-deps-down; \
-		cd - > /dev/null; \
+		(cd ./src/$(SERVICE) && $(MAKE) -s test-deps-down) || echo "No test-deps-down for $(SERVICE)"; \
+		exit $$exit_code; \
 	else \
 		echo "Running tests for all services..."; \
-		for service in $(SERVICES); do \
+		final_exit_code=0; \
+		for service in $(SERVICES); do { \
+			service_exit_code=0; \
 			echo "=> Starting dependencies for $$service..."; \
-			cd ./src/$$service && $(MAKE) test-deps-up; \
-			cd - > /dev/null; \
+			(cd ./src/$$service && $(MAKE) -s test-deps-up) || echo "No test-deps-up for $$service"; \
 			echo "=> Running Go tests for $$service..."; \
 			if find ./src/$$service -type f -name '*.go' | grep -q .; then \
-				go test -v ./src/$$service/...; \
+				go test -v ./src/$$service/... || service_exit_code=1; \
 			else \
 				echo "No Go files found in ./src/$$service."; \
 			fi; \
 			echo "=> Running Python tests for $$service..."; \
 			if find ./src/$$service -type f -name '*_test.py' | grep -q .; then \
-				pytest ./src/$$service; \
+				pytest ./src/$$service || service_exit_code=1; \
 			else \
 				echo "No Python tests found in ./src/$$service."; \
 			fi; \
 			echo "=> Stopping dependencies for $$service..."; \
-			cd ./src/$$service && $(MAKE) test-deps-down; \
-			cd - > /dev/null; \
-		done; \
+			(cd ./src/$$service && $(MAKE) -s test-deps-down) || echo "No test-deps-down for $$service"; \
+			if [ $$service_exit_code -ne 0 ]; then final_exit_code=1; fi \
+		}; done; \
+		exit $$final_exit_code; \
 	fi
 
 .PHONY: help

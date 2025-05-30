@@ -3,6 +3,12 @@
 .vscode/
 
 bin/
+logs.json
 
+__pycache__/
+
+.pytest*
+
+config.yml
+config.test.yml
 .env
-

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package musical;
+
+option go_package = "github.com/TeoPlow/online-music-service/src/musical/pkg/musicalpb";
+
+import "google/protobuf/timestamp.proto";
+
+message Artist {
+    string id = 1;
+    string name = 2;
+    string author = 3;
+    string producer = 4;
+    string country = 5;
+    string description = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+}
+
+message ListArtistsRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+    optional string search_query = 3;
+}
+
+message ListArtistsResponse {
+    repeated Artist artists = 1;
+}
+

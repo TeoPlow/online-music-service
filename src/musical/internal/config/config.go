@@ -10,12 +10,17 @@ import (
 
 type config struct {
 	DBConn   string `yaml:"dbconnection"`
-	HTTPPort string `yaml:"http_port"`
 	GRPCPort string `yaml:"grpc_port"`
 	Log      struct {
 		Level string `yaml:"level"`
 		File  string `yaml:"file"`
 	} `yaml:"log"`
+	Minio struct {
+		Endpoint  string `yaml:"endpoint"`
+		AccessKey string `yaml:"access"`
+		SecretKey string `yaml:"secret"`
+		UseSSL    bool   `yaml:"ssl"`
+	} `yaml:"minio"`
 }
 
 var Config config

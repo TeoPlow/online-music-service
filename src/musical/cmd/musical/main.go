@@ -4,10 +4,14 @@ import (
 	"context"
 	"flag"
 	"log"
+	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/TeoPlow/online-music-service/src/musical/internal/config"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/controllers/grpc"
-	"github.com/TeoPlow/online-music-service/src/musical/internal/controllers/http"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/db"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/domain"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/logger"
@@ -33,24 +37,43 @@ func main() {
 	}
 	defer tmanager.GetDatabase().Close()
 
-	storage := storage.NewMusicRepo(tmanager.GetDatabase())
+	minio, err := storage.NewMinIOClient(ctx, "audio")
 	if err != nil {
 		log.Panic(err)
 	}
 
-	service := domain.NewMusicService(storage, tmanager)
+	artistRepo := storage.NewArtistRepo(tmanager.GetDatabase())
+	artists := domain.NewArtistService(artistRepo, tmanager)
 
-	httpServer := http.NewServer(service)
-	grpcServer := grpc.NewServer(service)
+	albumRepo := storage.NewAlbumRepo(tmanager.GetDatabase())
+	albums := domain.NewAlbumService(albumRepo, tmanager, artists)
 
-	logger.Logger.Info("Running...")
+	streaming := domain.NewStreamingService(minio)
+
+	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase())
+	tracks := domain.NewTrackService(trackRepo, tmanager, albums, streaming)
+
+	grpcServer := grpc.NewServer(artists, albums, tracks, streaming)
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
 	go func() {
-		if err = grpcServer.Run(); err != nil {
+		logger.Logger.Info("Running...")
+		if err := grpcServer.Run(); err != nil {
 			log.Panic(err)
 		}
 	}()
 
-	if err = httpServer.ListenAndServe(); err != nil {
-		log.Panic(err)
+	<-stop
+	logger.Logger.Info("Shutting down gracefully...")
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer shutdownCancel()
+
+	if err := grpcServer.Shutdown(shutdownCtx); err != nil {
+		logger.Logger.Error("failed to shutdown", slog.String("error", err.Error()))
+	} else {
+		logger.Logger.Info("Server stopped cleanly")
 	}
 }
