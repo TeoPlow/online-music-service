@@ -37,23 +37,16 @@ func main() {
 	}
 	defer tmanager.GetDatabase().Close()
 
-	minio, err := storage.NewMinIOClient(ctx, "audio")
-	if err != nil {
-		log.Panic(err)
-	}
-
 	artistRepo := storage.NewArtistRepo(tmanager.GetDatabase())
 	artists := domain.NewArtistService(artistRepo, tmanager)
 
 	albumRepo := storage.NewAlbumRepo(tmanager.GetDatabase())
 	albums := domain.NewAlbumService(albumRepo, tmanager, artists)
 
-	streaming := domain.NewStreamingService(minio)
-
 	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase())
-	tracks := domain.NewTrackService(trackRepo, tmanager, albums, streaming)
+	tracks := domain.NewTrackService(trackRepo, tmanager, albums)
 
-	grpcServer := grpc.NewServer(artists, albums, tracks, streaming)
+	grpcServer := grpc.NewServer(artists, albums, tracks)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)

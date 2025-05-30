@@ -20,13 +20,11 @@ service MusicalService {
     rpc DeleteAlbum (IDRequest) returns (google.protobuf.Empty);
     rpc ListAlbums (ListAlbumsRequest) returns (ListAlbumsResponse);
     
-    rpc CreateTrack (stream CreateTrackRequest) returns (Track);
+    rpc CreateTrack (CreateTrackRequest) returns (Track);
     rpc GetTrack (IDRequest) returns (Track);
     rpc UpdateTrack (UpdateTrackRequest) returns (Track);
     rpc DeleteTrack (IDRequest) returns (google.protobuf.Empty);
     rpc ListTracks (ListTracksRequest) returns (ListTracksResponse);
-    
-    rpc DownloadTrack(IDRequest) returns (stream DownloadResponse);
     
     rpc LikeArtist (LikeArtistRequest) returns (google.protobuf.Empty);
     rpc UnlikeArtist (UnlikeArtistRequest) returns (google.protobuf.Empty);

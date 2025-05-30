@@ -130,7 +130,7 @@ func (x *Track) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-type TrackInfo struct {
+type CreateTrackRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	AlbumId       string                 `protobuf:"bytes,2,opt,name=album_id,json=albumId,proto3" json:"album_id,omitempty"`
@@ -142,92 +142,9 @@ type TrackInfo struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TrackInfo) Reset() {
-	*x = TrackInfo{}
-	mi := &file_track_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TrackInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TrackInfo) ProtoMessage() {}
-
-func (x *TrackInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_track_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TrackInfo.ProtoReflect.Descriptor instead.
-func (*TrackInfo) Descriptor() ([]byte, []int) {
-	return file_track_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *TrackInfo) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *TrackInfo) GetAlbumId() string {
-	if x != nil {
-		return x.AlbumId
-	}
-	return ""
-}
-
-func (x *TrackInfo) GetGenre() string {
-	if x != nil {
-		return x.Genre
-	}
-	return ""
-}
-
-func (x *TrackInfo) GetDuration() int32 {
-	if x != nil {
-		return x.Duration
-	}
-	return 0
-}
-
-func (x *TrackInfo) GetLyrics() string {
-	if x != nil && x.Lyrics != nil {
-		return *x.Lyrics
-	}
-	return ""
-}
-
-func (x *TrackInfo) GetIsExplicit() bool {
-	if x != nil {
-		return x.IsExplicit
-	}
-	return false
-}
-
-type CreateTrackRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Data:
-	//
-	//	*CreateTrackRequest_Metadata
-	//	*CreateTrackRequest_Chunk
-	Data          isCreateTrackRequest_Data `protobuf_oneof:"data"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
 func (x *CreateTrackRequest) Reset() {
 	*x = CreateTrackRequest{}
-	mi := &file_track_proto_msgTypes[2]
+	mi := &file_track_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -239,7 +156,7 @@ func (x *CreateTrackRequest) String() string {
 func (*CreateTrackRequest) ProtoMessage() {}
 
 func (x *CreateTrackRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_track_proto_msgTypes[2]
+	mi := &file_track_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -252,92 +169,49 @@ func (x *CreateTrackRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTrackRequest.ProtoReflect.Descriptor instead.
 func (*CreateTrackRequest) Descriptor() ([]byte, []int) {
-	return file_track_proto_rawDescGZIP(), []int{2}
+	return file_track_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateTrackRequest) GetData() isCreateTrackRequest_Data {
+func (x *CreateTrackRequest) GetTitle() string {
 	if x != nil {
-		return x.Data
+		return x.Title
 	}
-	return nil
+	return ""
 }
 
-func (x *CreateTrackRequest) GetMetadata() *TrackInfo {
+func (x *CreateTrackRequest) GetAlbumId() string {
 	if x != nil {
-		if x, ok := x.Data.(*CreateTrackRequest_Metadata); ok {
-			return x.Metadata
-		}
+		return x.AlbumId
 	}
-	return nil
+	return ""
 }
 
-func (x *CreateTrackRequest) GetChunk() []byte {
+func (x *CreateTrackRequest) GetGenre() string {
 	if x != nil {
-		if x, ok := x.Data.(*CreateTrackRequest_Chunk); ok {
-			return x.Chunk
-		}
+		return x.Genre
 	}
-	return nil
+	return ""
 }
 
-type isCreateTrackRequest_Data interface {
-	isCreateTrackRequest_Data()
-}
-
-type CreateTrackRequest_Metadata struct {
-	Metadata *TrackInfo `protobuf:"bytes,1,opt,name=metadata,proto3,oneof"`
-}
-
-type CreateTrackRequest_Chunk struct {
-	Chunk []byte `protobuf:"bytes,2,opt,name=chunk,proto3,oneof"`
-}
-
-func (*CreateTrackRequest_Metadata) isCreateTrackRequest_Data() {}
-
-func (*CreateTrackRequest_Chunk) isCreateTrackRequest_Data() {}
-
-type DownloadResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Chunk         []byte                 `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DownloadResponse) Reset() {
-	*x = DownloadResponse{}
-	mi := &file_track_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DownloadResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DownloadResponse) ProtoMessage() {}
-
-func (x *DownloadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_track_proto_msgTypes[3]
+func (x *CreateTrackRequest) GetDuration() int32 {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
+		return x.Duration
 	}
-	return mi.MessageOf(x)
+	return 0
 }
 
-// Deprecated: Use DownloadResponse.ProtoReflect.Descriptor instead.
-func (*DownloadResponse) Descriptor() ([]byte, []int) {
-	return file_track_proto_rawDescGZIP(), []int{3}
+func (x *CreateTrackRequest) GetLyrics() string {
+	if x != nil && x.Lyrics != nil {
+		return *x.Lyrics
+	}
+	return ""
 }
 
-func (x *DownloadResponse) GetChunk() []byte {
+func (x *CreateTrackRequest) GetIsExplicit() bool {
 	if x != nil {
-		return x.Chunk
+		return x.IsExplicit
 	}
-	return nil
+	return false
 }
 
 type UpdateTrackRequest struct {
@@ -355,7 +229,7 @@ type UpdateTrackRequest struct {
 
 func (x *UpdateTrackRequest) Reset() {
 	*x = UpdateTrackRequest{}
-	mi := &file_track_proto_msgTypes[4]
+	mi := &file_track_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -367,7 +241,7 @@ func (x *UpdateTrackRequest) String() string {
 func (*UpdateTrackRequest) ProtoMessage() {}
 
 func (x *UpdateTrackRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_track_proto_msgTypes[4]
+	mi := &file_track_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -380,7 +254,7 @@ func (x *UpdateTrackRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTrackRequest.ProtoReflect.Descriptor instead.
 func (*UpdateTrackRequest) Descriptor() ([]byte, []int) {
-	return file_track_proto_rawDescGZIP(), []int{4}
+	return file_track_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *UpdateTrackRequest) GetId() string {
@@ -445,7 +319,7 @@ type ListTracksRequest struct {
 
 func (x *ListTracksRequest) Reset() {
 	*x = ListTracksRequest{}
-	mi := &file_track_proto_msgTypes[5]
+	mi := &file_track_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -457,7 +331,7 @@ func (x *ListTracksRequest) String() string {
 func (*ListTracksRequest) ProtoMessage() {}
 
 func (x *ListTracksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_track_proto_msgTypes[5]
+	mi := &file_track_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -470,7 +344,7 @@ func (x *ListTracksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTracksRequest.ProtoReflect.Descriptor instead.
 func (*ListTracksRequest) Descriptor() ([]byte, []int) {
-	return file_track_proto_rawDescGZIP(), []int{5}
+	return file_track_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListTracksRequest) GetPage() int32 {
@@ -517,7 +391,7 @@ type ListTracksResponse struct {
 
 func (x *ListTracksResponse) Reset() {
 	*x = ListTracksResponse{}
-	mi := &file_track_proto_msgTypes[6]
+	mi := &file_track_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -529,7 +403,7 @@ func (x *ListTracksResponse) String() string {
 func (*ListTracksResponse) ProtoMessage() {}
 
 func (x *ListTracksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_track_proto_msgTypes[6]
+	mi := &file_track_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -542,7 +416,7 @@ func (x *ListTracksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTracksResponse.ProtoReflect.Descriptor instead.
 func (*ListTracksResponse) Descriptor() ([]byte, []int) {
-	return file_track_proto_rawDescGZIP(), []int{6}
+	return file_track_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListTracksResponse) GetTracks() []*Track {
@@ -570,8 +444,8 @@ const file_track_proto_rawDesc = "" +
 	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\t\n" +
-	"\a_lyrics\"\xb7\x01\n" +
-	"\tTrackInfo\x12\x14\n" +
+	"\a_lyrics\"\xc0\x01\n" +
+	"\x12CreateTrackRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x19\n" +
 	"\balbum_id\x18\x02 \x01(\tR\aalbumId\x12\x14\n" +
 	"\x05genre\x18\x03 \x01(\tR\x05genre\x12\x1a\n" +
@@ -579,13 +453,7 @@ const file_track_proto_rawDesc = "" +
 	"\x06lyrics\x18\x05 \x01(\tH\x00R\x06lyrics\x88\x01\x01\x12\x1f\n" +
 	"\vis_explicit\x18\x06 \x01(\bR\n" +
 	"isExplicitB\t\n" +
-	"\a_lyrics\"f\n" +
-	"\x12CreateTrackRequest\x120\n" +
-	"\bmetadata\x18\x01 \x01(\v2\x12.musical.TrackInfoH\x00R\bmetadata\x12\x16\n" +
-	"\x05chunk\x18\x02 \x01(\fH\x00R\x05chunkB\x06\n" +
-	"\x04data\"(\n" +
-	"\x10DownloadResponse\x12\x14\n" +
-	"\x05chunk\x18\x01 \x01(\fR\x05chunk\"\xa7\x02\n" +
+	"\a_lyrics\"\xa7\x02\n" +
 	"\x12UpdateTrackRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\x05title\x18\x02 \x01(\tH\x00R\x05title\x88\x01\x01\x12\x1e\n" +
@@ -625,27 +493,24 @@ func file_track_proto_rawDescGZIP() []byte {
 	return file_track_proto_rawDescData
 }
 
-var file_track_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_track_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_track_proto_goTypes = []any{
 	(*Track)(nil),                 // 0: musical.Track
-	(*TrackInfo)(nil),             // 1: musical.TrackInfo
-	(*CreateTrackRequest)(nil),    // 2: musical.CreateTrackRequest
-	(*DownloadResponse)(nil),      // 3: musical.DownloadResponse
-	(*UpdateTrackRequest)(nil),    // 4: musical.UpdateTrackRequest
-	(*ListTracksRequest)(nil),     // 5: musical.ListTracksRequest
-	(*ListTracksResponse)(nil),    // 6: musical.ListTracksResponse
-	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
+	(*CreateTrackRequest)(nil),    // 1: musical.CreateTrackRequest
+	(*UpdateTrackRequest)(nil),    // 2: musical.UpdateTrackRequest
+	(*ListTracksRequest)(nil),     // 3: musical.ListTracksRequest
+	(*ListTracksResponse)(nil),    // 4: musical.ListTracksResponse
+	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
 }
 var file_track_proto_depIdxs = []int32{
-	7, // 0: musical.Track.created_at:type_name -> google.protobuf.Timestamp
-	7, // 1: musical.Track.updated_at:type_name -> google.protobuf.Timestamp
-	1, // 2: musical.CreateTrackRequest.metadata:type_name -> musical.TrackInfo
-	0, // 3: musical.ListTracksResponse.tracks:type_name -> musical.Track
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	5, // 0: musical.Track.created_at:type_name -> google.protobuf.Timestamp
+	5, // 1: musical.Track.updated_at:type_name -> google.protobuf.Timestamp
+	0, // 2: musical.ListTracksResponse.tracks:type_name -> musical.Track
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_track_proto_init() }
@@ -655,19 +520,15 @@ func file_track_proto_init() {
 	}
 	file_track_proto_msgTypes[0].OneofWrappers = []any{}
 	file_track_proto_msgTypes[1].OneofWrappers = []any{}
-	file_track_proto_msgTypes[2].OneofWrappers = []any{
-		(*CreateTrackRequest_Metadata)(nil),
-		(*CreateTrackRequest_Chunk)(nil),
-	}
-	file_track_proto_msgTypes[4].OneofWrappers = []any{}
-	file_track_proto_msgTypes[5].OneofWrappers = []any{}
+	file_track_proto_msgTypes[2].OneofWrappers = []any{}
+	file_track_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_track_proto_rawDesc), len(file_track_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

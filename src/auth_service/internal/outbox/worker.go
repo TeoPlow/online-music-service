@@ -72,9 +72,9 @@ func (w *Worker) processBatch(ctx context.Context) error {
 		return err
 	}
 
-	logger.Log.Debug("Outbox batch check",
-		slog.String("op", op),
-		slog.Int("events_count", len(events)))
+	// logger.Log.Debug("Outbox batch check",
+	// 	slog.String("op", op),
+	// 	slog.Int("events_count", len(events)))
 
 	if len(events) == 0 {
 		return nil

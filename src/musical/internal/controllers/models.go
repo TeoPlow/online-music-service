@@ -2,9 +2,7 @@
 package controllers
 
 import (
-	"bytes"
 	"context"
-	"io"
 
 	"github.com/google/uuid"
 
@@ -12,12 +10,8 @@ import (
 	"github.com/TeoPlow/online-music-service/src/musical/internal/models/dto"
 )
 
-type StreamingService interface {
-	DownloadTrack(context.Context, uuid.UUID) (io.ReadCloser, error)
-}
-
 type TrackService interface {
-	CreateTrack(context.Context, dto.CreateTrackRequest, *bytes.Buffer) (models.Track, error)
+	CreateTrack(context.Context, dto.CreateTrackRequest) (models.Track, error)
 	UpdateTrack(context.Context, dto.UpdateTrackRequest) (models.Track, error)
 	DeleteTrack(ctx context.Context, id uuid.UUID) error
 	GetTrack(ctx context.Context, id uuid.UUID) (models.Track, error)

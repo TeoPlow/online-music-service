@@ -1,5 +1,4 @@
 env: local
-log_level: debug
 
 db_url: postgres://user:password@postgres:5432/auth_db?sslmode=disable
   

@@ -38,8 +38,7 @@ type BaseIntegrationSuite struct {
 	ArtistRepo *storage.ArtistRepository
 	TrackRepo  *storage.TrackRepository
 
-	TxM         *db.TxManager
-	MinIOClient *storage.MinIOClient
+	TxM *db.TxManager
 }
 
 func (s *BaseIntegrationSuite) SetupSuite() {
@@ -60,19 +59,15 @@ func (s *BaseIntegrationSuite) SetupSuite() {
 	albumRepo := storage.NewAlbumRepo(tmanager.GetDatabase())
 	albumService := domain.NewAlbumService(albumRepo, tmanager, artistService)
 
-	minio, err := storage.NewMinIOClient(s.ctx, "test")
-	s.Require().NoError(err)
-	streamingService := domain.NewStreamingService(minio)
-
 	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase())
-	trackService := domain.NewTrackService(trackRepo, tmanager, albumService, streamingService)
+	trackService := domain.NewTrackService(trackRepo, tmanager, albumService)
 
 	// bufconn listener
 	listener = bufconn.Listen(bufSize)
 	server := grpc.NewServer()
 
 	// grpc ctrl init + registration
-	grpcSrv := grpcctrl.NewServer(artistService, albumService, trackService, streamingService)
+	grpcSrv := grpcctrl.NewServer(artistService, albumService, trackService)
 	grpcSrv.Register(server)
 
 	go func() {
@@ -94,7 +89,6 @@ func (s *BaseIntegrationSuite) SetupSuite() {
 	s.ArtistRepo = artistRepo
 	s.TrackRepo = trackRepo
 	s.TxM = tmanager
-	s.MinIOClient = minio
 }
 
 func bufDialer(context.Context, string) (net.Conn, error) {
