@@ -126,6 +126,8 @@ linters-settings:
             - "google.golang.org/protobuf/types/known/timestamppb"
             # redis
             - "github.com/redis/go-redis/v9"
+            # kafka
+            - "github.com/IBM/sarama"
             #internal packages
             - "github.com/TeoPlow/online-music-service/src/auth_service"
         
