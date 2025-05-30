@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -26,17 +27,32 @@ type AlbumClient interface {
 	GetAlbum(ctx context.Context, id uuid.UUID) (models.Album, error)
 }
 
+type StreamingClient interface {
+	SaveTrack(context.Context, uuid.UUID, *bytes.Buffer) error
+	DeleteTrack(context.Context, uuid.UUID) error
+}
+
 type TrackService struct {
-	repo        TrackRepo
-	txm         TxManager
-	albumClient AlbumClient
+	repo            TrackRepo
+	txm             TxManager
+	albumClient     AlbumClient
+	streamingClient StreamingClient
 }
 
-func NewTrackService(s TrackRepo, txm TxManager, client AlbumClient) *TrackService {
-	return &TrackService{repo: s, txm: txm, albumClient: client}
+func NewTrackService(s TrackRepo, txm TxManager,
+	client AlbumClient, streamer StreamingClient,
+) *TrackService {
+	return &TrackService{
+		repo:            s,
+		txm:             txm,
+		albumClient:     client,
+		streamingClient: streamer,
+	}
 }
 
-func (service *TrackService) CreateTrack(ctx context.Context, req dto.CreateTrackRequest) (models.Track, error) {
+func (service *TrackService) CreateTrack(ctx context.Context,
+	req dto.CreateTrackRequest, file *bytes.Buffer,
+) (models.Track, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return models.Track{}, fmt.Errorf("failed to create uuid: %w", err)
@@ -67,6 +83,10 @@ func (service *TrackService) CreateTrack(ctx context.Context, req dto.CreateTrac
 		}
 
 		if err = service.repo.Add(ctx, track); err != nil {
+			return ErrInternal
+		}
+
+		if err = service.streamingClient.SaveTrack(ctx, track.ID, file); err != nil {
 			return ErrInternal
 		}
 		return nil
@@ -135,13 +155,18 @@ func (service *TrackService) UpdateTrack(ctx context.Context, req dto.UpdateTrac
 }
 
 func (service *TrackService) DeleteTrack(ctx context.Context, id uuid.UUID) error {
-	if err := service.repo.Delete(ctx, id); err != nil {
-		if errors.Is(err, storage.ErrNotExists) {
-			return fmt.Errorf("track %w", ErrNotFound)
+	return service.txm.RunReadUncommited(ctx, func(ctx context.Context) error {
+		if err := service.repo.Delete(ctx, id); err != nil {
+			if errors.Is(err, storage.ErrNotExists) {
+				return fmt.Errorf("track %w", ErrNotFound)
+			}
+			return ErrInternal
 		}
-		return ErrInternal
-	}
-	return nil
+		if err := service.streamingClient.DeleteTrack(ctx, id); err != nil {
+			return ErrInternal
+		}
+		return nil
+	})
 }
 
 func (service *TrackService) GetTrack(ctx context.Context, id uuid.UUID) (models.Track, error) {

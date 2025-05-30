@@ -19,7 +19,7 @@ kafka:
 
 postgres:
   host: postgres
-  port: 5432
+  port: 9000
   user: default # Не пашет
-  password: password
+  password: "mysecurepassword"
   database: analysis_db

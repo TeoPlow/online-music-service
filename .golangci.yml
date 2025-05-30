@@ -97,6 +97,8 @@ linters-settings:
           # for postgres
           - "github.com/jackc"
           - "github.com/georgysavva/scany/pgxscan"
+          # for minio
+          - "github.com/minio/minio-go/v7"
           # internal packages
           - "github.com/TeoPlow/online-music-service/src/musical/internal"
           - "github.com/TeoPlow/online-music-service/src/musical/pkg"
@@ -121,8 +123,11 @@ linters-settings:
             - "golang.org/x/crypto/bcrypt"
             # grpc
             - "google.golang.org/grpc"
+            - "google.golang.org/protobuf/types/known/timestamppb"
             # redis
             - "github.com/redis/go-redis/v9"
+            # kafka
+            - "github.com/IBM/sarama"
             #internal packages
             - "github.com/TeoPlow/online-music-service/src/auth_service"
         

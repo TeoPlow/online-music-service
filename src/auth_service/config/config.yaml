@@ -1,4 +1,5 @@
 env: local
+log_level: debug
 
 db_url: postgres://user:password@postgres:5432/auth_db?sslmode=disable
   
@@ -12,10 +13,32 @@ grpc_server:
 jwt_secret: "secret"
 
 redis:
-  host: localhost
-  port: 6378
+  host: redis
+  port: 6379
   password: ""
   db: 0
   dial_timeout: 5s
   read_timeout: 3s
   write_timeout: 3s
+
+kafka:
+  brokers:
+    - kafka:9092
+  tls:
+    enable: false
+    ca_cert: /certs/ca.pem
+    cert: /certs/client.pem
+    key: /certs/client.key
+  topics:
+    user_created: auth-users
+    artist_created: auth-artists
+  retries: 5
+  version: "3.2.3"
+  retry_backoff: 100ms
+  flush_frequency: 200ms
+  compression: snappy
+  client_id: auth_service
+
+outbox:
+  batch_size: 100
+  poll_interval: 2s

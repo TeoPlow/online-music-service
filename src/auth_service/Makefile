@@ -3,7 +3,7 @@ include ../../Makefile
 CONFIG_PATH=./config/config.yaml
 COMPOSE_PATH=./config/docker-compose.yml
 MIGRATIONS_DIR=./migrations
-DB_URL=postgres://testuser:testpass@localhost:5433/auth_db
+DB_URL=postgres://user:password@localhost:5432/auth_db
 
 .PHONY: build
 build: gen-pb
@@ -25,7 +25,7 @@ compose-up:
 compose-down:
 	@docker compose -f $(COMPOSE_PATH) down 
 
-# Migrations
+# Migrationsgo generate ./...
 .PHONY: migrate-up
 migrate-up:
 	goose -dir $(MIGRATIONS_DIR) postgres "$(DB_URL)" up
@@ -44,6 +44,3 @@ gen-pb:
 # for tests
 .PHONY: test-deps-up
 test-deps-up: compose-up migrate-up
-
-.PHONY: test-deps-down
-test-deps-down: compose-down

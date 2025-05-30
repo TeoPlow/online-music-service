@@ -9,6 +9,7 @@ from app.kafka.handlers import (
     handle_music_tracks,
     handler_music_liked_tracks,
     handler_music_liked_artists,
+    handle_event,
 )
 from app.kafka.topics import (
     AUTH_USERS,
@@ -17,6 +18,7 @@ from app.kafka.topics import (
     MUSIC_TRACKS,
     MUSIC_LIKED_TRACKS,
     MUSIC_LIKED_ARTISTS,
+    MUSIC_EVENT,
 )
 
 from app.core.settings import settings
@@ -32,6 +34,7 @@ TOPIC_HANDLERS = {
     MUSIC_TRACKS: handle_music_tracks,
     MUSIC_LIKED_TRACKS: handler_music_liked_tracks,
     MUSIC_LIKED_ARTISTS: handler_music_liked_artists,
+    MUSIC_EVENT: handle_event,
 }
 
 

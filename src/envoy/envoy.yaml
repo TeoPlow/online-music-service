@@ -19,7 +19,7 @@ static_resources:
               domains: ["*"]
               routes:
               - match:
-                  prefix: "/auth.Auth/"
+                  prefix: "/auth.AuthService/"
                 route:
                   cluster: auth_service
               - match:
@@ -44,7 +44,7 @@ static_resources:
         - endpoint:
             address:
               socket_address:
-                address: 127.0.0.1
+                address: auth
                 port_value: 50051
 
   - name: musical_service
@@ -59,7 +59,7 @@ static_resources:
         - endpoint:
             address:
               socket_address:
-                address: 127.0.0.1
+                address: musical
                 port_value: 50052
 
 admin:

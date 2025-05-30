@@ -3,7 +3,7 @@ include ../../Makefile
 CONFIG_PATH=./configs/cfg.yml
 COMPOSE_PATH=./configs/docker-compose.yml
 MIGRATIONS_DIR=./migrations
-DB_URL=postgresql://user:password@localhost:5432/music
+DB_URL=postgres://user:password@localhost:5432/musical_db
 TEST_COMPOSE_PATH=./configs/test.docker-compose.yml
 TEST_DB_URL=postgres://test:test@localhost:5432/test-musical?sslmode=disable
 
@@ -68,6 +68,7 @@ gen-mock:
 	mockgen -destination=tests/mocks/track_repo_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain TrackRepo
 	mockgen -destination=tests/mocks/artist_service_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain ArtistClient
 	mockgen -destination=tests/mocks/album_service_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain AlbumClient
+	mockgen -destination=tests/mocks/streaming_service_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain StreamingClient
 	mockgen -destination=tests/mocks/tx_manager_mock.go -package=mocks github.com/TeoPlow/online-music-service/src/musical/internal/domain TxManager
 
 # for tests

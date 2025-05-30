@@ -73,7 +73,7 @@ const file_musical_proto_rawDesc = "" +
 	"\rmusical.proto\x12\amusical\x1a\valbum.proto\x1a\fartist.proto\x1a\n" +
 	"like.proto\x1a\vtrack.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x1b\n" +
 	"\tIDRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id2\x95\t\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id2\xd9\t\n" +
 	"\x0eMusicalService\x120\n" +
 	"\tGetArtist\x12\x12.musical.IDRequest\x1a\x0f.musical.Artist\x12H\n" +
 	"\vListArtists\x12\x1b.musical.ListArtistsRequest\x1a\x1c.musical.ListArtistsResponse\x12:\n" +
@@ -82,13 +82,14 @@ const file_musical_proto_rawDesc = "" +
 	"\vUpdateAlbum\x12\x1b.musical.UpdateAlbumRequest\x1a\x0e.musical.Album\x129\n" +
 	"\vDeleteAlbum\x12\x12.musical.IDRequest\x1a\x16.google.protobuf.Empty\x12E\n" +
 	"\n" +
-	"ListAlbums\x12\x1a.musical.ListAlbumsRequest\x1a\x1b.musical.ListAlbumsResponse\x12:\n" +
-	"\vCreateTrack\x12\x1b.musical.CreateTrackRequest\x1a\x0e.musical.Track\x12.\n" +
+	"ListAlbums\x12\x1a.musical.ListAlbumsRequest\x1a\x1b.musical.ListAlbumsResponse\x12<\n" +
+	"\vCreateTrack\x12\x1b.musical.CreateTrackRequest\x1a\x0e.musical.Track(\x01\x12.\n" +
 	"\bGetTrack\x12\x12.musical.IDRequest\x1a\x0e.musical.Track\x12:\n" +
 	"\vUpdateTrack\x12\x1b.musical.UpdateTrackRequest\x1a\x0e.musical.Track\x129\n" +
 	"\vDeleteTrack\x12\x12.musical.IDRequest\x1a\x16.google.protobuf.Empty\x12E\n" +
 	"\n" +
 	"ListTracks\x12\x1a.musical.ListTracksRequest\x1a\x1b.musical.ListTracksResponse\x12@\n" +
+	"\rDownloadTrack\x12\x12.musical.IDRequest\x1a\x19.musical.DownloadResponse0\x01\x12@\n" +
 	"\n" +
 	"LikeArtist\x12\x1a.musical.LikeArtistRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
 	"\fUnlikeArtist\x12\x1c.musical.UnlikeArtistRequest\x1a\x16.google.protobuf.Empty\x12T\n" +
@@ -132,8 +133,9 @@ var file_musical_proto_goTypes = []any{
 	(*ListAlbumsResponse)(nil),      // 18: musical.ListAlbumsResponse
 	(*Track)(nil),                   // 19: musical.Track
 	(*ListTracksResponse)(nil),      // 20: musical.ListTracksResponse
-	(*GetLikedArtistsResponse)(nil), // 21: musical.GetLikedArtistsResponse
-	(*GetLikedTracksResponse)(nil),  // 22: musical.GetLikedTracksResponse
+	(*DownloadResponse)(nil),        // 21: musical.DownloadResponse
+	(*GetLikedArtistsResponse)(nil), // 22: musical.GetLikedArtistsResponse
+	(*GetLikedTracksResponse)(nil),  // 23: musical.GetLikedTracksResponse
 }
 var file_musical_proto_depIdxs = []int32{
 	0,  // 0: musical.MusicalService.GetArtist:input_type -> musical.IDRequest
@@ -148,32 +150,34 @@ var file_musical_proto_depIdxs = []int32{
 	6,  // 9: musical.MusicalService.UpdateTrack:input_type -> musical.UpdateTrackRequest
 	0,  // 10: musical.MusicalService.DeleteTrack:input_type -> musical.IDRequest
 	7,  // 11: musical.MusicalService.ListTracks:input_type -> musical.ListTracksRequest
-	8,  // 12: musical.MusicalService.LikeArtist:input_type -> musical.LikeArtistRequest
-	9,  // 13: musical.MusicalService.UnlikeArtist:input_type -> musical.UnlikeArtistRequest
-	10, // 14: musical.MusicalService.GetLikedArtists:input_type -> musical.GetLikedArtistsRequest
-	11, // 15: musical.MusicalService.LikeTrack:input_type -> musical.LikeTrackRequest
-	12, // 16: musical.MusicalService.UnlikeTrack:input_type -> musical.UnlikeTrackRequest
-	13, // 17: musical.MusicalService.GetLikedTracks:input_type -> musical.GetLikedTracksRequest
-	14, // 18: musical.MusicalService.GetArtist:output_type -> musical.Artist
-	15, // 19: musical.MusicalService.ListArtists:output_type -> musical.ListArtistsResponse
-	16, // 20: musical.MusicalService.CreateAlbum:output_type -> musical.Album
-	16, // 21: musical.MusicalService.GetAlbum:output_type -> musical.Album
-	16, // 22: musical.MusicalService.UpdateAlbum:output_type -> musical.Album
-	17, // 23: musical.MusicalService.DeleteAlbum:output_type -> google.protobuf.Empty
-	18, // 24: musical.MusicalService.ListAlbums:output_type -> musical.ListAlbumsResponse
-	19, // 25: musical.MusicalService.CreateTrack:output_type -> musical.Track
-	19, // 26: musical.MusicalService.GetTrack:output_type -> musical.Track
-	19, // 27: musical.MusicalService.UpdateTrack:output_type -> musical.Track
-	17, // 28: musical.MusicalService.DeleteTrack:output_type -> google.protobuf.Empty
-	20, // 29: musical.MusicalService.ListTracks:output_type -> musical.ListTracksResponse
-	17, // 30: musical.MusicalService.LikeArtist:output_type -> google.protobuf.Empty
-	17, // 31: musical.MusicalService.UnlikeArtist:output_type -> google.protobuf.Empty
-	21, // 32: musical.MusicalService.GetLikedArtists:output_type -> musical.GetLikedArtistsResponse
-	17, // 33: musical.MusicalService.LikeTrack:output_type -> google.protobuf.Empty
-	17, // 34: musical.MusicalService.UnlikeTrack:output_type -> google.protobuf.Empty
-	22, // 35: musical.MusicalService.GetLikedTracks:output_type -> musical.GetLikedTracksResponse
-	18, // [18:36] is the sub-list for method output_type
-	0,  // [0:18] is the sub-list for method input_type
+	0,  // 12: musical.MusicalService.DownloadTrack:input_type -> musical.IDRequest
+	8,  // 13: musical.MusicalService.LikeArtist:input_type -> musical.LikeArtistRequest
+	9,  // 14: musical.MusicalService.UnlikeArtist:input_type -> musical.UnlikeArtistRequest
+	10, // 15: musical.MusicalService.GetLikedArtists:input_type -> musical.GetLikedArtistsRequest
+	11, // 16: musical.MusicalService.LikeTrack:input_type -> musical.LikeTrackRequest
+	12, // 17: musical.MusicalService.UnlikeTrack:input_type -> musical.UnlikeTrackRequest
+	13, // 18: musical.MusicalService.GetLikedTracks:input_type -> musical.GetLikedTracksRequest
+	14, // 19: musical.MusicalService.GetArtist:output_type -> musical.Artist
+	15, // 20: musical.MusicalService.ListArtists:output_type -> musical.ListArtistsResponse
+	16, // 21: musical.MusicalService.CreateAlbum:output_type -> musical.Album
+	16, // 22: musical.MusicalService.GetAlbum:output_type -> musical.Album
+	16, // 23: musical.MusicalService.UpdateAlbum:output_type -> musical.Album
+	17, // 24: musical.MusicalService.DeleteAlbum:output_type -> google.protobuf.Empty
+	18, // 25: musical.MusicalService.ListAlbums:output_type -> musical.ListAlbumsResponse
+	19, // 26: musical.MusicalService.CreateTrack:output_type -> musical.Track
+	19, // 27: musical.MusicalService.GetTrack:output_type -> musical.Track
+	19, // 28: musical.MusicalService.UpdateTrack:output_type -> musical.Track
+	17, // 29: musical.MusicalService.DeleteTrack:output_type -> google.protobuf.Empty
+	20, // 30: musical.MusicalService.ListTracks:output_type -> musical.ListTracksResponse
+	21, // 31: musical.MusicalService.DownloadTrack:output_type -> musical.DownloadResponse
+	17, // 32: musical.MusicalService.LikeArtist:output_type -> google.protobuf.Empty
+	17, // 33: musical.MusicalService.UnlikeArtist:output_type -> google.protobuf.Empty
+	22, // 34: musical.MusicalService.GetLikedArtists:output_type -> musical.GetLikedArtistsResponse
+	17, // 35: musical.MusicalService.LikeTrack:output_type -> google.protobuf.Empty
+	17, // 36: musical.MusicalService.UnlikeTrack:output_type -> google.protobuf.Empty
+	23, // 37: musical.MusicalService.GetLikedTracks:output_type -> musical.GetLikedTracksResponse
+	19, // [19:38] is the sub-list for method output_type
+	0,  // [0:19] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

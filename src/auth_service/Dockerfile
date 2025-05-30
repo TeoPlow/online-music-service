@@ -7,16 +7,20 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main ./cmd/main
+RUN apk add --no-cache protobuf && \
+    go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
+    go build -o auth_service ./src/auth_service/cmd/auth_service/main.go
 
-FROM alpine:3.18
+FROM alpine:latest
 
 WORKDIR /app
 
-COPY --from=builder /app/main .
-COPY config ./config  
-COPY .env .            
+COPY --from=builder /app/auth_service .
+
+COPY src/auth_service/config ./config
+COPY src/auth_service/.env .
 
 EXPOSE 50051
 
-CMD ["./main"]
+CMD ["./auth_service", "--path", "./config/config.yaml"]

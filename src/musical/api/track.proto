@@ -18,13 +18,24 @@ message Track {
     google.protobuf.Timestamp updated_at = 9;
 }
 
-message CreateTrackRequest {
+message TrackInfo {
     string title = 1;
     string album_id = 2;
     string genre = 3;
     int32 duration = 4;
     optional string lyrics = 5;
     bool is_explicit = 6;
+}
+
+message CreateTrackRequest {
+    oneof data {
+        TrackInfo metadata = 1;
+        bytes chunk = 2;
+    }
+}
+
+message DownloadResponse {
+    bytes chunk = 1;
 }
 
 message UpdateTrackRequest {

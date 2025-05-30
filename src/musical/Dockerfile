@@ -7,15 +7,20 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main ./cmd/main
+RUN apk add --no-cache protobuf git && \
+    go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
+    go build -o musical ./src/musical/cmd/musical/main.go
 
-FROM alpine:3.18
+
+FROM alpine:latest
 
 WORKDIR /app
 
-COPY --from=builder /app/main .
-COPY configs ./config
+COPY --from=builder /app/musical .
+
+COPY src/musical/configs ./configs
 
 EXPOSE 50052
 
-CMD ["./main"]
+CMD ["./musical", "--path", "./configs/cfg.yml"]

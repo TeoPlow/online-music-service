@@ -1,17 +1,20 @@
 include ../../Makefile
 
+MIGRATIONS_DIR=./app/db/migrations/sql
 CONFIG_PATH=./config.yml
 COMPOSE_PATH=./docker-compose.yml
+DB_URL=postgres://user:password@localhost:5432/analysis_db
 TESTS_PATH=./tests
 
 .PHONY: setup-venv start-services stop-services remove-volumes postgres-shell
 
 # Запуск сервисов в фоне
-start-services:
+run-detached:
 	@echo "Starting services..."
 	docker-compose -f ${COMPOSE_PATH} up --build -d
 
-start-services+:
+# Запуск сервисов в интерактивном режиме (в терминале)
+run:
 	@echo "Starting services..."
 	docker-compose -f ${COMPOSE_PATH} up --build
 
@@ -19,6 +22,11 @@ start-services+:
 stop-services:
 	@echo "Stopping services..."
 	docker-compose -f ${COMPOSE_PATH} down
+
+# Запуск миграций
+.PHONY: migrate-up
+migrate-up:
+	goose -dir $(MIGRATIONS_DIR) postgres "$(DB_URL)" up
 
 # Удаление всех томов и остановка сервисов
 remove-volumes:

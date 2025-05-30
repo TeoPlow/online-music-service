@@ -31,7 +31,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: music_streaming
+      POSTGRES_DB: analysis_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./app/db/migrations/sql:/docker-entrypoint-initdb.d
