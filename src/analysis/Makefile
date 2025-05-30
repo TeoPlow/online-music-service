@@ -27,6 +27,8 @@ start-services+:
 stop-services:
 	@echo "Stopping services..."
 	docker compose -f ${COMPOSE_PATH} down
+	@echo "Stopping superset..."
+	docker compose -f ${SUPERSET_COMPOSE_PATH} down
 
 # Удаление всех томов и остановка сервисов
 remove-volumes:
