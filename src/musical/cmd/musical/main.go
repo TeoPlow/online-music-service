@@ -53,7 +53,10 @@ func main() {
 	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase())
 	tracks := domain.NewTrackService(trackRepo, tmanager, albums, streaming)
 
-	grpcServer := grpc.NewServer(artists, albums, tracks, streaming)
+	likeRepo := storage.NewLikeRepo(tmanager.GetDatabase())
+	likes := domain.NewLikeService(likeRepo, artists, tracks, tmanager)
+
+	grpcServer := grpc.NewServer(artists, albums, tracks, streaming, likes)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)

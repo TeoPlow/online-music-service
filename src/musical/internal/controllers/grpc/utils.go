@@ -1,17 +1,25 @@
 package grpc
 
 import (
+	"context"
 	"errors"
 	"time"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/TeoPlow/online-music-service/src/musical/internal/domain"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/models"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/models/dto"
 	pb "github.com/TeoPlow/online-music-service/src/musical/pkg/musicalpb"
+)
+
+var (
+	ErrNoMetadata    = errors.New("no metadata in context")
+	ErrNoUserID      = errors.New("no user_id in metadata")
+	ErrInvalidUserID = errors.New("invalid user_id format")
 )
 
 func errorCode(err error) codes.Code {
@@ -25,6 +33,22 @@ func errorCode(err error) codes.Code {
 	default:
 		return codes.Internal
 	}
+}
+
+func GetUserIDFromContext(ctx context.Context) (uuid.UUID, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return uuid.Nil, ErrNoMetadata
+	}
+	values := md.Get("user_id")
+	if len(values) == 0 {
+		return uuid.Nil, ErrNoUserID
+	}
+	userID, err := uuid.Parse(values[0])
+	if err != nil {
+		return uuid.Nil, ErrInvalidUserID
+	}
+	return userID, nil
 }
 
 func protoFromAlbum(a models.Album) *pb.Album {
@@ -179,4 +203,38 @@ func protoToListTracksRequest(p *pb.ListTracksRequest) (dto.ListTracksRequest, e
 	}
 
 	return req, nil
+}
+
+func protoToGetLikedTracksRequest(p *pb.GetLikedTracksRequest) (dto.GetLikedTracksRequest, error) {
+	return dto.GetLikedTracksRequest{
+		Page:     int(p.GetPage()),
+		PageSize: int(p.GetPageSize()),
+	}, nil
+}
+
+func protoToGetLikedArtistsRequest(p *pb.GetLikedArtistsRequest) (dto.GetLikedArtistsRequest, error) {
+	return dto.GetLikedArtistsRequest{
+		Page:     int(p.GetPage()),
+		PageSize: int(p.GetPageSize()),
+	}, nil
+}
+
+func protoFromGetLikedTracksResponse(tracks []models.Track) *pb.GetLikedTracksResponse {
+	var protoTracks []*pb.Track
+	for _, track := range tracks {
+		protoTracks = append(protoTracks, protoFromTrack(track))
+	}
+	return &pb.GetLikedTracksResponse{
+		Tracks: protoTracks,
+	}
+}
+
+func protoFromGetLikedArtistsResponse(artists []models.Artist) *pb.GetLikedArtistsResponse {
+	var protoArtists []*pb.Artist
+	for _, artist := range artists {
+		protoArtists = append(protoArtists, protoFromArtist(artist))
+	}
+	return &pb.GetLikedArtistsResponse{
+		Artists: protoArtists,
+	}
 }

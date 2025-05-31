@@ -37,6 +37,7 @@ type BaseIntegrationSuite struct {
 	AlbumRepo  *storage.AlbumRepository
 	ArtistRepo *storage.ArtistRepository
 	TrackRepo  *storage.TrackRepository
+	LikeRepo   *storage.LikeRepository
 
 	TxM         *db.TxManager
 	MinIOClient *storage.MinIOClient
@@ -67,12 +68,15 @@ func (s *BaseIntegrationSuite) SetupSuite() {
 	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase())
 	trackService := domain.NewTrackService(trackRepo, tmanager, albumService, streamingService)
 
+	likeRepo := storage.NewLikeRepo(tmanager.GetDatabase())
+	likeService := domain.NewLikeService(likeRepo, artistService, trackService, tmanager)
+
 	// bufconn listener
 	listener = bufconn.Listen(bufSize)
 	server := grpc.NewServer()
 
 	// grpc ctrl init + registration
-	grpcSrv := grpcctrl.NewServer(artistService, albumService, trackService, streamingService)
+	grpcSrv := grpcctrl.NewServer(artistService, albumService, trackService, streamingService, likeService)
 	grpcSrv.Register(server)
 
 	go func() {
@@ -93,6 +97,7 @@ func (s *BaseIntegrationSuite) SetupSuite() {
 	s.AlbumRepo = albumRepo
 	s.ArtistRepo = artistRepo
 	s.TrackRepo = trackRepo
+	s.LikeRepo = likeRepo
 	s.TxM = tmanager
 	s.MinIOClient = minio
 }
