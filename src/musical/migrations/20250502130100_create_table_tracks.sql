@@ -33,12 +33,16 @@ CREATE TABLE "artists"(
 CREATE TABLE "liked_artists"(
     "user_id" UUID NOT NULL,
     "artist_id" UUID NOT NULL,
-    "created_at" TIMESTAMPTZ NOT NULL
+    "created_at" TIMESTAMPTZ NOT NULL,
+    CONSTRAINT fk_artist FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
+
 );
 CREATE TABLE "liked_tracks"(
     "user_id" UUID NOT NULL,
     "track_id" UUID NOT NULL,
-    "created_at" TIMESTAMPTZ NOT NULL
+    "created_at" TIMESTAMPTZ NOT NULL,
+    CONSTRAINT fk_track FOREIGN KEY (track_id) REFERENCES tracks(id) ON DELETE CASCADE
+
 );
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;

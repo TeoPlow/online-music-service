@@ -20,6 +20,7 @@ type Server struct {
 	albumService     controllers.AlbumService
 	trackService     controllers.TrackService
 	streamingService controllers.StreamingService
+	likeService      controllers.LikeService
 
 	grpcServer *grpc.Server
 	listener   net.Listener
@@ -30,12 +31,14 @@ func NewServer(
 	albumServ controllers.AlbumService,
 	trackServ controllers.TrackService,
 	streamServ controllers.StreamingService,
+	likeServ controllers.LikeService,
 ) *Server {
 	return &Server{
 		artistService:    artistServ,
 		albumService:     albumServ,
 		trackService:     trackServ,
 		streamingService: streamServ,
+		likeService:      likeServ,
 	}
 }
 

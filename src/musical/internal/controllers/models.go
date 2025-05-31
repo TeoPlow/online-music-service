@@ -35,3 +35,12 @@ type AlbumService interface {
 type ArtistService interface {
 	GetArtist(ctx context.Context, id uuid.UUID) (models.Artist, error)
 }
+
+type LikeService interface {
+	LikeTrack(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) error
+	UnlikeTrack(ctx context.Context, userID uuid.UUID, trackID uuid.UUID) error
+	LikeArtist(ctx context.Context, userID uuid.UUID, artistID uuid.UUID) error
+	UnlikeArtist(ctx context.Context, userID uuid.UUID, artistID uuid.UUID) error
+	GetLikedArtists(ctx context.Context, userID uuid.UUID, req dto.GetLikedArtistsRequest) ([]models.Artist, error)
+	GetLikedTracks(ctx context.Context, userID uuid.UUID, req dto.GetLikedTracksRequest) ([]models.Track, error)
+}

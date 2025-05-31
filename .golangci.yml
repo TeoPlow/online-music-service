@@ -74,6 +74,7 @@ linters-settings:
           - "github.com/google/uuid"
           - "google.golang.org/grpc"
           - "github.com/TeoPlow/online-music-service"
+          - "google.golang.org/protobuf/types/known/emptypb"
           # for auth
           - "github.com/golang-jwt/jwt"
           - "github.com/jackc/pgx"
