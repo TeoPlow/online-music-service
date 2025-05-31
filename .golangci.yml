@@ -103,11 +103,11 @@ linters-settings:
           # internal packages
           - "github.com/TeoPlow/online-music-service/src/musical/internal"
           - "github.com/TeoPlow/online-music-service/src/musical/pkg"
-      auth_service-internal:
+      auth-internal:
         list-mode: strict
         files:
-          - "**/auth_service/internal/**"
-          - "**/auth_service/**/*.go"
+          - "**/auth/internal/**"
+          - "**/auth/**/*.go"
           - "!**/*_test.go"
         allow:
             # std
@@ -130,7 +130,7 @@ linters-settings:
             # kafka
             - "github.com/IBM/sarama"
             #internal packages
-            - "github.com/TeoPlow/online-music-service/src/auth_service"
+            - "github.com/TeoPlow/online-music-service/src/auth"
         
       other:
         list-mode: strict
@@ -138,7 +138,7 @@ linters-settings:
           - $all
           - "!**/cmd/**"
           - "!**/musical/**"
-          - "!**/auth_service/**"
+          - "!**/auth/**"
           - "!**/*_test.go"
         allow:
           - $gostd
@@ -150,6 +150,7 @@ issues:
     - "mocks"
   exclude-files:
     - ".*_mock.go"
+    - "testing/cmd/client/main.go"
   max-issues-per-linter: 0
   max-same-issues: 0
   exclude:

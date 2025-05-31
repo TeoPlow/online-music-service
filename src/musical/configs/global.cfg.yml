@@ -1,0 +1,11 @@
+dbconnection: postgresql://user:password@postgres:5432/musical_db
+grpc_port: :50052
+
+log:
+  level: info
+
+minio:
+  endpoint: "minio:9000"
+  access: "minioadmin"
+  secret: "minioadmin123"
+  ssl: false
