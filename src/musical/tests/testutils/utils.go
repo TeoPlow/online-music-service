@@ -11,6 +11,9 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/google/uuid"
+	"google.golang.org/grpc/metadata"
+
 	"github.com/TeoPlow/online-music-service/src/musical/internal/db"
 )
 
@@ -72,4 +75,9 @@ func CompareTracks(expected, actual []byte) bool {
 		return false
 	}
 	return true
+}
+
+func ContextWithUserID(ctx context.Context, userID uuid.UUID) context.Context {
+	md := metadata.Pairs("user_id", userID.String())
+	return metadata.NewOutgoingContext(ctx, md)
 }

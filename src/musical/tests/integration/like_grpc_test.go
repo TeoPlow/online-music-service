@@ -148,7 +148,6 @@ func (ts *LikeServiceTest) TestLikeTrack() {
 		ts.T().Run(tt.name, func(t *testing.T) {
 			ctx := testutils.ContextWithUserID(ts.T().Context(), userID)
 
-			// Нет необходимости создавать новый запрос, используем непосредственно tt.req
 			res, err := ts.Client.LikeTrack(ctx, tt.req)
 			if err != nil {
 				st, ok := status.FromError(err)

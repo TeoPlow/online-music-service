@@ -25,29 +25,29 @@ type TrackClient interface {
 }
 
 type LikeService struct {
-	likeRepo   LikeRepo
-	artistRepo ArtistClient
-	trackRepo  TrackClient
-	txm        TxManager
+	likeRepo     LikeRepo
+	artistClient ArtistClient
+	trackClient  TrackClient
+	txm          TxManager
 }
 
 func NewLikeService(
 	likeRepo LikeRepo,
-	artistRepo ArtistClient,
-	trackRepo TrackClient,
+	artistClient ArtistClient,
+	trackClient TrackClient,
 	txm TxManager,
 ) *LikeService {
 	return &LikeService{
-		likeRepo:   likeRepo,
-		artistRepo: artistRepo,
-		trackRepo:  trackRepo,
-		txm:        txm,
+		likeRepo:     likeRepo,
+		artistClient: artistClient,
+		trackClient:  trackClient,
+		txm:          txm,
 	}
 }
 
 func (s *LikeService) LikeTrack(ctx context.Context, userID, trackID uuid.UUID) error {
 	return s.txm.RunSerializable(ctx, func(ctx context.Context) error {
-		_, err := s.trackRepo.GetTrack(ctx, trackID)
+		_, err := s.trackClient.GetTrack(ctx, trackID)
 		if err != nil {
 			if errors.Is(err, storage.ErrNotExists) {
 				return ErrNotFound
@@ -66,7 +66,7 @@ func (s *LikeService) LikeTrack(ctx context.Context, userID, trackID uuid.UUID) 
 
 func (s *LikeService) UnlikeTrack(ctx context.Context, userID, trackID uuid.UUID) error {
 	return s.txm.RunSerializable(ctx, func(ctx context.Context) error {
-		_, err := s.trackRepo.GetTrack(ctx, trackID)
+		_, err := s.trackClient.GetTrack(ctx, trackID)
 		if err != nil {
 			if errors.Is(err, storage.ErrNotExists) {
 				return ErrNotFound
@@ -85,7 +85,7 @@ func (s *LikeService) UnlikeTrack(ctx context.Context, userID, trackID uuid.UUID
 
 func (s *LikeService) LikeArtist(ctx context.Context, userID, artistID uuid.UUID) error {
 	return s.txm.RunSerializable(ctx, func(ctx context.Context) error {
-		_, err := s.artistRepo.GetArtist(ctx, artistID)
+		_, err := s.artistClient.GetArtist(ctx, artistID)
 		if err != nil {
 			if errors.Is(err, storage.ErrNotExists) {
 				return ErrNotFound
@@ -103,7 +103,7 @@ func (s *LikeService) LikeArtist(ctx context.Context, userID, artistID uuid.UUID
 }
 func (s *LikeService) UnlikeArtist(ctx context.Context, userID, artistID uuid.UUID) error {
 	return s.txm.RunSerializable(ctx, func(ctx context.Context) error {
-		_, err := s.artistRepo.GetArtist(ctx, artistID)
+		_, err := s.artistClient.GetArtist(ctx, artistID)
 		if err != nil {
 			if errors.Is(err, storage.ErrNotExists) {
 				return ErrNotFound
