@@ -19,7 +19,6 @@ var (
 
 func LoadCountries(staticFilePath string) (map[string]bool, error) {
 	countrieOnce.Do(func() {
-
 		filePath := filepath.Join(staticFilePath, "countries.json")
 		data, err := os.ReadFile(filePath)
 		if err != nil {

@@ -72,6 +72,7 @@ func ValidateUpdateUserRequest(req *auth.UpdateUserRequest) error {
 	}
 	return nil
 }
+
 func ValidateUpdateArtistRequest(req *auth.UpdateArtistRequest) error {
 	if req.GetId() == "" {
 		return ErrArtistIDRequired
@@ -83,6 +84,7 @@ func ValidateUpdateArtistRequest(req *auth.UpdateArtistRequest) error {
 	}
 	return nil
 }
+
 func ValidateChangePasswordRequest(req *auth.ChangePasswordRequest) error {
 	if req.GetId() == "" {
 		return ErrUserIDRequired

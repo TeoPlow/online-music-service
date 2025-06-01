@@ -55,7 +55,6 @@ func NewSaramaConfig(
 	}
 
 	return cfg, nil
-
 }
 
 func loadTLSConfig(caFile, certFile, keyFile string) (*tls.Config, error) {

@@ -40,7 +40,7 @@ py-deps:
 
 .PHONY: py-fmt
 py-fmt:
-	$(PYENV) black . --exclude .venv
+	$(PYENV) black --line-length 79 . --exclude .venv
 
 # Common tasks
 .PHONY: lint

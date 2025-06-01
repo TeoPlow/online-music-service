@@ -155,6 +155,7 @@ func (s *OutboxRepositorySuite) TestFetchUnsentBatch() {
 	require.NoError(s.T(), err, "FetchUnsentBatch with limit should not return an error")
 	assert.Len(s.T(), limitedEvents, 2, "Should fetch only 2 events when limited")
 }
+
 func (s *OutboxRepositorySuite) TestMarkEventAsSent() {
 	err := s.outboxRepository.MarkEventAsSent(s.ctx, s.insertedEventID)
 	require.NoError(s.T(), err, "MarkEventAsSent should not return an error")

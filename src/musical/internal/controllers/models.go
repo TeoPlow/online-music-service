@@ -13,7 +13,7 @@ import (
 )
 
 type StreamingService interface {
-	DownloadTrack(context.Context, uuid.UUID) (io.ReadCloser, error)
+	DownloadTrack(context.Context, uuid.UUID, uuid.UUID) (io.ReadCloser, error)
 }
 
 type TrackService interface {

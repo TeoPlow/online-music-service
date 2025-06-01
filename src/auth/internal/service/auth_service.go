@@ -371,6 +371,7 @@ func (s *AuthService) GetUser(
 
 	return resp, nil
 }
+
 func (s *AuthService) GetArtist(
 	ctx context.Context,
 	params dto.GetArtistParams,
@@ -401,6 +402,7 @@ func (s *AuthService) GetArtist(
 
 	return resp, nil
 }
+
 func (s *AuthService) UpdateUser(
 	ctx context.Context,
 	params dto.UpdateUserParams,
@@ -480,7 +482,6 @@ func (s *AuthService) UpdateArtist(
 		resp.Success = true
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}

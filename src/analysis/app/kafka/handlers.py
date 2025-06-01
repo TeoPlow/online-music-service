@@ -166,7 +166,8 @@ async def handle_music_albums(message: dict):
         client = await get_db_client()
 
         release_datetime = datetime.fromisoformat(
-            message["release_date"].replace("Z", "+00:00"))
+            message["release_date"].replace("Z", "+00:00")
+        )
         release_date = release_datetime.date()
 
         album_id = UUID(message["id"])
