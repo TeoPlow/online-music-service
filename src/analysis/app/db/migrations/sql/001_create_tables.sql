@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS users (
             country TEXT,
             age SMALLINT,
             role TEXT,
-            created_at TIMESTAMP,
-            updated_at TIMESTAMP
+            created_at TIMESTAMPTZ,
+            updated_at TIMESTAMPTZ
         );
 
 CREATE TABLE IF NOT EXISTS artists (
@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS artists (
             producer TEXT,
             country TEXT,
             description TEXT,
-            created_at TIMESTAMP,
-            updated_at TIMESTAMP
+            created_at TIMESTAMPTZ,
+            updated_at TIMESTAMPTZ
         );
 
 CREATE TABLE IF NOT EXISTS albums (
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS albums (
             title TEXT,
             artist_id UUID REFERENCES artists(id),
             release_date DATE,
-            updated_at TIMESTAMP
+            updated_at TIMESTAMPTZ
         );
 
 CREATE TABLE IF NOT EXISTS tracks (
@@ -38,12 +38,12 @@ CREATE TABLE IF NOT EXISTS tracks (
             duration INTEGER,
             lyrics TEXT,
             is_explicit BOOLEAN,
-            created_at TIMESTAMP,
-            updated_at TIMESTAMP
+            created_at TIMESTAMPTZ,
+            updated_at TIMESTAMPTZ
         );
 
 CREATE TABLE IF NOT EXISTS events (
-            event_time TIMESTAMP,
+            event_time TIMESTAMPTZ,
             user_id UUID REFERENCES users(id),
             track_id UUID REFERENCES tracks(id)
         );

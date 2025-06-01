@@ -153,8 +153,8 @@ func (s *AuthService) RegisterUser(
 			Country:   user.Country,
 			Age:       user.Age,
 			Role:      profile.Role,
-			CreatedAt: profile.CreatedAt,
-			UpdatedAt: profile.UpdatedAt,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		}
 		topic, key, payload, err := producer.BuildUserCreatedMessage(
 			userFull, s.kafkaTopics,
@@ -232,8 +232,8 @@ func (s *AuthService) RegisterArtist(
 			ID:          profile.ID,
 			Username:    profile.Username,
 			Role:        profile.Role,
-			CreatedAt:   profile.CreatedAt,
-			UpdatedAt:   profile.UpdatedAt,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
 			Producer:    artist.Producer,
 			Author:      artist.Author,
 			Country:     artist.Country,
