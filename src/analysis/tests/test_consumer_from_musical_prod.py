@@ -46,8 +46,9 @@ async def test_one_message_to_consumer(db_pool):
         retrieved_artist.created_at.strftime("%Y-%m-%dT%H:%M:%S")
         == artist["created_at"]
     )
+    # Падает из-за разных UTC поздно ночью
     # assert (
-    #     retrieved_artist.updated_at.strftime("%Y-%m-%d") # Падает из-за разных UTC поздно ночью
+    #     retrieved_artist.updated_at.strftime("%Y-%m-%d")
     #     == artist["updated_at"].split("T")[0]
     # )
 
@@ -73,8 +74,9 @@ async def test_one_message_to_consumer(db_pool):
         retrieved_track.created_at.strftime("%Y-%m-%dT%H:%M:%S")
         == track["created_at"]
     )
+    # Падает из-за разных UTC поздно ночью
     # assert (
-    #     retrieved_track.updated_at.strftime("%Y-%m-%d") # Падает из-за разных UTC поздно ночью
+    #     retrieved_track.updated_at.strftime("%Y-%m-%d")
     #     == track["updated_at"].split("T")[0]
     # )
 
@@ -126,8 +128,9 @@ async def test_multiple_messages_to_consumer(db_pool):
             retrieved_artist.created_at.strftime("%Y-%m-%dT%H:%M:%S")
             == artist["created_at"]
         )
+        # Падает из-за разных UTC поздно ночью
         # assert (
-        #     retrieved_artist.updated_at.strftime("%Y-%m-%d")  # Падает из-за разных UTC поздно ночью
+        #     retrieved_artist.updated_at.strftime("%Y-%m-%d")
         #     == artist["updated_at"].split("T")[0]
         # )
 
@@ -159,8 +162,9 @@ async def test_multiple_messages_to_consumer(db_pool):
             retrieved_track.created_at.strftime("%Y-%m-%dT%H:%M:%S")
             == track["created_at"]
         )
+        # Падает из-за разных UTC поздно ночью
         # assert (
-        #     retrieved_track.updated_at.strftime("%Y-%m-%d") # Падает из-за разных UTC поздно ночью
+        #     retrieved_track.updated_at.strftime("%Y-%m-%d")
         #     == track["updated_at"].split("T")[0]
         # )
 
