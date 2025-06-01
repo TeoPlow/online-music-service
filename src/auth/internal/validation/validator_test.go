@@ -28,11 +28,11 @@ func TestValidateRegisterUserRequest(t *testing.T) {
 	}
 
 	staticDir := filepath.Join(tempDir, "static")
-	if err := os.MkdirAll(staticDir, 0755); err != nil {
+	if err := os.MkdirAll(staticDir, 0o755); err != nil {
 		t.Fatalf("Failed to create static directory: %v", err)
 	}
 
-	if err := os.WriteFile(filepath.Join(staticDir, "countries.json"), jsonData, 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(staticDir, "countries.json"), jsonData, 0o644); err != nil {
 		t.Fatalf("Failed to write test countries file: %v", err)
 	}
 
@@ -581,6 +581,7 @@ func TestValidateRegistrationRole(t *testing.T) {
 		})
 	}
 }
+
 func TestValidateCountry(t *testing.T) {
 	countries := map[string]bool{
 		"russia":                   true,
@@ -656,7 +657,7 @@ func TestLoadCountries(t *testing.T) {
 	}
 	countriesJSON := `["russia", "united states of america", "germany", "france"]`
 	if err := os.WriteFile(filepath.Join(cfg.StaticFilesPath, "countries.json"),
-		[]byte(countriesJSON), 0644); err != nil {
+		[]byte(countriesJSON), 0o644); err != nil {
 		t.Fatalf("Failed to write countries.json: %v", err)
 	}
 	countries, err := LoadCountries(cfg.StaticFilesPath)

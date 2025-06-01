@@ -155,7 +155,11 @@ func (s *Server) DownloadTrack(
 	if err != nil {
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
-	object, err := s.streamingService.DownloadTrack(ctx, id)
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return status.Error(codes.InvalidArgument, err.Error())
+	}
+	object, err := s.streamingService.DownloadTrack(ctx, userID, id)
 	if err != nil {
 		return status.Error(errorCode(err), err.Error())
 	}

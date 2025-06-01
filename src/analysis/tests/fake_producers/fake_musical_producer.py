@@ -26,10 +26,10 @@ fake = Faker()
 log.info("[musical] Started async fake musical producer.")
 
 try:
-    with open("../static/genres.json", "r") as f:
+    with open("./src/static/genres.json", "r") as f:
         genres = json.load(f)
 except FileNotFoundError:
-    log.error(f"File {os.getcwd()}/../static/genres.json not found.")
+    log.error(f"File {os.getcwd()}/./src/static/genres.json not found.")
     log.error("Exiting the program..")
     exit(1)
 

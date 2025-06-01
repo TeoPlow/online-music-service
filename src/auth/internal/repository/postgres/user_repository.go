@@ -34,7 +34,8 @@ func (r *UserRepositoryPostgres) CreateUser(ctx context.Context,
 	) VALUES ($1, $2, $3, $4, $5)
 	`
 
-	params := []interface{}{user.ProfileID,
+	params := []interface{}{
+		user.ProfileID,
 		user.Email,
 		user.Gender,
 		user.Country,

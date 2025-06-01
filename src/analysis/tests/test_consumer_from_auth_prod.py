@@ -69,6 +69,3 @@ async def test_multiple_messages_to_consumer(db_pool):
         date = retrieved_user.created_at.strftime("%Y-%m-%dT%H:%M:%S")
         assert date == user["created_at"]
         assert retrieved_user.country == user["country"]
-
-
-# Написать тесты для фейкового продюсера из музыкального сервиса.

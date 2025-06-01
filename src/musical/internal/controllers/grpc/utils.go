@@ -40,7 +40,7 @@ func GetUserIDFromContext(ctx context.Context) (uuid.UUID, error) {
 	if !ok {
 		return uuid.Nil, ErrNoMetadata
 	}
-	values := md.Get("user_id")
+	values := md.Get("x-user-id")
 	if len(values) == 0 {
 		return uuid.Nil, ErrNoUserID
 	}

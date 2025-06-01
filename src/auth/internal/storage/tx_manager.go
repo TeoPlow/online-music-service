@@ -54,6 +54,7 @@ func (m *TxManager) RunReadCommited(ctx context.Context, f func(ctx context.Cont
 	}
 	return m.beginFunc(ctx, opts, f)
 }
+
 func (m *TxManager) beginFunc(ctx context.Context, opts pgx.TxOptions, f func(context.Context) error) error {
 	tx, err := m.db.GetPool().BeginTx(ctx, opts)
 	if err != nil {

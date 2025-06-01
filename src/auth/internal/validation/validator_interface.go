@@ -51,6 +51,7 @@ func (v *validator) ValidateGetUserRequest(req *auth.GetUserRequest) error {
 func (v *validator) ValidateUpdateUserRequest(req *auth.UpdateUserRequest) error {
 	return ValidateUpdateUserRequest(req)
 }
+
 func (v *validator) ValidateUpdateArtistRequest(req *auth.UpdateArtistRequest) error {
 	return ValidateUpdateArtistRequest(req)
 }

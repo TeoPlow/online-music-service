@@ -27,8 +27,9 @@ func (s *StreamingService) SaveTrack(ctx context.Context, id uuid.UUID, b *bytes
 	return s.storage.Upload(ctx, id.String(), b, int64(size))
 }
 
-func (s *StreamingService) DownloadTrack(ctx context.Context, id uuid.UUID) (io.ReadCloser, error) {
-	return s.storage.Download(ctx, id.String())
+func (s *StreamingService) DownloadTrack(ctx context.Context, userID, trackID uuid.UUID) (io.ReadCloser, error) {
+	SendListeningEvent(ctx, userID, trackID)
+	return s.storage.Download(ctx, trackID.String())
 }
 
 func (s *StreamingService) DeleteTrack(ctx context.Context, id uuid.UUID) error {

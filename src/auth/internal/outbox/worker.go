@@ -59,8 +59,8 @@ func (w *Worker) Start(ctx context.Context) {
 			}
 		}
 	}
-
 }
+
 func (w *Worker) processBatch(ctx context.Context) error {
 	const op = "outbox.Worker.processBatch"
 

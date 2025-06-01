@@ -5,6 +5,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 
 	pb "github.com/TeoPlow/online-music-service/src/musical/pkg/musicalpb"
@@ -33,6 +34,7 @@ func (ts *StreamingServiceTest) TearDownTest() {
 func (ts *StreamingServiceTest) TestDownloadTrack() {
 	ctx := ts.T().Context()
 
+	ctx = testutils.ContextWithUserID(ctx, uuid.New())
 	original := testutils.TrackFromFile("meow-meow")
 	id := "97e6da54-54d6-4e74-890c-970a47543554"
 

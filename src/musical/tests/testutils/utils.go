@@ -78,6 +78,6 @@ func CompareTracks(expected, actual []byte) bool {
 }
 
 func ContextWithUserID(ctx context.Context, userID uuid.UUID) context.Context {
-	md := metadata.Pairs("user_id", userID.String())
+	md := metadata.Pairs("x-user-id", userID.String())
 	return metadata.NewOutgoingContext(ctx, md)
 }

@@ -35,7 +35,6 @@ func BuildUserCreatedMessage(
 	key = user.ID.String()
 
 	return topic, key, payload, nil
-
 }
 
 func BuildArtistCreatedMessage(

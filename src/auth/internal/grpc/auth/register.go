@@ -33,7 +33,6 @@ func (s *serverAPI) RegisterUser(ctx context.Context,
 	}
 
 	out, err := s.service.RegisterUser(ctx, params)
-
 	if err != nil {
 
 		if errors.Is(err, service.ErrUserAlreadyExists) {
@@ -67,7 +66,6 @@ func (s *serverAPI) RegisterArtist(ctx context.Context,
 	}
 
 	out, err := s.service.RegisterArtist(ctx, params)
-
 	if err != nil {
 		if errors.Is(err, service.ErrArtistAlreadyExists) {
 			return nil, status.Error(codes.AlreadyExists, err.Error())

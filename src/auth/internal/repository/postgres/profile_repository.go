@@ -102,7 +102,6 @@ func (r *ProfileRepositoryPostgres) GetProfileByID(
 		return nil, fmt.Errorf("%s: %w", op, ErrFailedToGetProfile)
 	}
 	return &p, nil
-
 }
 
 func (r *ProfileRepositoryPostgres) GetProfileByUsername(ctx context.Context,
