@@ -4,6 +4,7 @@ MUSIC_ALBUMS = "music-albums"
 MUSIC_TRACKS = "music-tracks"
 MUSIC_LIKED_ARTISTS = "music-liked-artists"
 MUSIC_LIKED_TRACKS = "music-liked-tracks"
+MUSIC_EVENTS = "music-events"
 
 ALL_TOPICS = [
     AUTH_USERS,
@@ -12,4 +13,5 @@ ALL_TOPICS = [
     MUSIC_TRACKS,
     MUSIC_LIKED_ARTISTS,
     MUSIC_LIKED_TRACKS,
+    MUSIC_EVENTS
 ]

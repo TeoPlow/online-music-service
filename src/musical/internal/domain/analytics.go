@@ -18,6 +18,7 @@ const (
 	topicAnalyticTrack      = "music-tracks"
 	topicAnalyticLikeTrack  = "music-liked-tracks"
 	topicAnalyticLikeArtist = "music-liked-artists"
+	topicAnalyticListen		= "music-events"
 )
 
 type Publisher interface {
@@ -119,5 +120,20 @@ func SendLikeArtist(ctx context.Context, userID, artistID uuid.UUID) {
 		userID.String(), []byte(payload)); err != nil {
 		l.Error("failed to send statistics",
 			slog.String("error", err.Error()))
+	}
+}
+
+func SendListeningEvent(ctx context.Context, userID, trackID uuid.UUID) {
+    l := logger.Logger.With(slog.String("where", "domain.SendLikeTrack"))
+	if analyticPublisher == nil {
+        l.Error("analytic publisher uninitialized, can not send statistics")
+		return
+    }
+	payload := fmt.Sprintf(`{"user_id":"%s", "track_id":"%s"}`, userID, trackID)
+    if err := analyticPublisher.Publish(ctx,
+		topicAnalyticListen,
+        userID.String(), []byte(payload)); err != nil {
+		l.Error("failed to send statistics",
+            slog.String("error", err.Error()))
 	}
 }
