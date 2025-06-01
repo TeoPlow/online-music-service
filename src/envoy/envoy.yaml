@@ -1,0 +1,261 @@
+# Конфигурация Envoy в роли API Gateway (шлюза), работающего в Docker-сети с сервисами "auth" и "musical".
+# Проксирует gRPC-вызовы к AuthService (хост "auth":50051) и MusicalService (хост "musical":50052).
+static_resources:
+  listeners:
+    - name: listener_0
+      address:
+        socket_address:
+          address: 0.0.0.0             # Основной listener на всех сетевых интерфейсах
+          port_value: 8080             # Порт gateway (HTTP/2, для gRPC-трафика)
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              # HTTP Connection Manager с цепочкой фильтров: JWT-аутентификация, RBAC и маршрутизация
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: ingress_http
+                codec_type: AUTO                        # Автоопределение HTTP протокола (поддерживает HTTP/2 для gRPC)
+                route_config:
+                  virtual_hosts:
+                    - name: services
+                      domains: ["*"]
+                      routes:
+                        # Маршрутизация запросов по префиксу пути к соответствующим сервисам:
+                        - match:
+                            prefix: "/auth.AuthService/"
+                          route:
+                            cluster: auth_service       # Все вызовы AuthService направляются в кластер auth_service
+                        - match:
+                            prefix: "/musical.MusicalService/"
+                          route:
+                            cluster: musical_service    # Все вызовы MusicalService направляются в кластер musical_service
+                http_filters:
+                  - name: envoy.filters.http.jwt_authn
+                    # Фильтр JWT-аутентификации: проверяет JWT в заголовке Authorization и извлекает claims `uuid` и `role`
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+                      providers:
+                        jwt_provider:
+                          local_jwks:
+                            inline_string: '{"keys":[{"kty":"oct","alg":"HS256","k":"c2VjcmV0"}]}'  
+                            # HMAC-ключ "secret" задан локально в JWKS (поле "k" — это base64url от "secret", то есть "c2VjcmV0")
+                          from_headers:
+                            - name: Authorization
+                              value_prefix: "Bearer "   # Извлекаем JWT из заголовка Authorization: Bearer <token>
+                          claim_to_headers:
+                            # Извлекаем важные claims JWT и добавляем их в метаданные запроса (как заголовки). 
+                            # Если в оригинальном запросе уже были эти заголовки, они будут перезаписаны значениями из токена.
+                            - claim_name: uuid
+                              header_name: "x-user-id"   # user_id из claim `uuid` -> добавляется в заголовок x-user-id (gRPC metadata)
+                            - claim_name: role
+                              header_name: "x-user-role" # роль пользователя из claim `role` -> добавляется в заголовок x-user-role
+                      rules:
+                        # Правила требований JWT для различных путей (gRPC методов):
+                        # Публичные методы (не требуют JWT) – используем allow_missing_or_failed
+                        - match:
+                            prefix: "/auth.AuthService/" # Все методы AuthService (например, регистрация, логин) открыты для всех
+                          requires:
+                            allow_missing_or_failed: {}  # JWT не требуется: допускаем отсутствие или некорректный токен
+                        - match:
+                            prefix: "/musical.MusicalService/GetTrack"
+                          requires:
+                            allow_missing_or_failed: {}  # Публичный метод MusicalService -> JWT не проверяется
+                        - match:
+                            prefix: "/musical.MusicalService/ListTracks"
+                          requires:
+                            allow_missing_or_failed: {}
+                        - match:
+                            prefix: "/musical.MusicalService/GetAlbum"
+                          requires:
+                            allow_missing_or_failed: {}
+                        - match:
+                            prefix: "/musical.MusicalService/ListAlbums"
+                          requires:
+                            allow_missing_or_failed: {}
+                        - match:
+                            prefix: "/musical.MusicalService/GetArtist"
+                          requires:
+                            allow_missing_or_failed: {}
+                        - match:
+                            prefix: "/musical.MusicalService/ListArtists"
+                          requires:
+                            allow_missing_or_failed: {}
+                        # Закрытые методы (требуют валидного JWT) – используем provider_name для обязательной проверки токена
+                        - match:
+                            prefix: "/musical.MusicalService/DownloadTrack"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/LikeTrack"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/UnlikeTrack"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/GetLikedTracks"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/LikeArtist"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/UnlikeArtist"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/GetLikedArtists"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/CreateTrack"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/DeleteTrack"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/UpdateTrack"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/CreateAlbum"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/DeleteAlbum"
+                          requires:
+                            provider_name: jwt_provider
+                        - match:
+                            prefix: "/musical.MusicalService/UpdateAlbum"
+                          requires:
+                            provider_name: jwt_provider
+                  - name: envoy.filters.http.rbac
+                    # Фильтр RBAC: ограничивает доступ к методам MusicalService на основе роли пользователя (из JWT)
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBAC
+                      rules:
+                        action: ALLOW        # Разрешить запрос только если он удовлетворяет одной из нижеописанных политик
+                        policies:
+                          # Все методы AuthService разрешены всем (даже без аутентификации)
+                          AuthServiceOpen:
+                            permissions:
+                              - url_path:
+                                  path: { prefix: "/auth.AuthService/" }
+                            principals:
+                              - any: true
+                          # Публичные методы MusicalService разрешены всем (без токена)
+                          MusicalPublic:
+                            permissions:
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/GetTrack" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/ListTracks" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/GetAlbum" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/ListAlbums" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/GetArtist" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/ListArtists" }
+                            principals:
+                              - any: true
+                          # DownloadTrack доступен только аутентифицированным пользователям (любая роль)
+                          MusicalDownloadAuth:
+                            permissions:
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/DownloadTrack" }
+                            principals:
+                              - header:
+                                  name: "x-user-role"
+                                  present_match: true   # Требуется присутствие заголовка x-user-role (означает, что JWT был валидный)
+                          # CreateTrack/DeleteTrack доступны только ролям "artist" или "admin"
+                          MusicalArtistOrAdmin:
+                            permissions:
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/CreateTrack" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/UpdateTrack" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/DeleteTrack" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/CreateAlbum" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/UpdateAlbum" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/DeleteAlbum" }
+                            principals:
+                              - header:
+                                  name: "x-user-role"
+                                  exact_match: "artist"
+                              - header:
+                                  name: "x-user-role"
+                                  exact_match: "admin"
+                          # LikeTrack доступен только роли "user"
+                          MusicalLikeUser:
+                            permissions:
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/LikeTrack" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/UnlikeTrack" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/GetLikedTracks" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/LikeArtist" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/UnlikeArtist" }
+                              - url_path:
+                                  path: { prefix: "/musical.MusicalService/GetLikedArtists" }
+                            principals:
+                              - header:
+                                  name: "x-user-role"
+                                  exact_match: "user"
+                  # [TBS-35]: Фильтр grpc_json_transcoder для поддержки REST->gRPC трансформации
+                  # - name: envoy.filters.http.grpc_json_transcoder
+                  #   typed_config:
+                  #     "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
+                  #     proto_descriptor: "/path/to/protos/descriptors.pb"   # файл с описанием сервисов (сгенерированный .pb)
+                  #     services: ["auth.AuthService", "musical.MusicalService"]          # имена gRPC-сервисов для транскодирования
+                  #     print_options:
+                  #       always_print_primitive_fields: true                # печатать поля со значениями по умолчанию в JSON ответе
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+                      # Фильтр маршрутизации: после прохождения других фильтров направляет запрос в нужный кластер
+  clusters:
+    # Кластер upstream для AuthService (gRPC-сервис аутентификации)
+    - name: auth_service
+      connect_timeout: 1s
+      type: LOGICAL_DNS
+      dns_lookup_family: V4_ONLY
+      lb_policy: ROUND_ROBIN
+      http2_protocol_options: {}              # Включаем HTTP/2 для подключения к gRPC (поддержка stream-методов)
+      load_assignment:
+        cluster_name: auth_service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: auth          # DNS-имя хоста сервиса auth в Docker-сети
+                      port_value: 50051
+    # Кластер upstream для MusicalService (gRPC-сервис музыкального каталога)
+    - name: musical_service
+      connect_timeout: 1s
+      type: LOGICAL_DNS
+      dns_lookup_family: V4_ONLY
+      lb_policy: ROUND_ROBIN
+      http2_protocol_options: {}              # Включаем HTTP/2 для gRPC (поддержка потоковых методов CreateTrack/DownloadTrack)
+      load_assignment:
+        cluster_name: musical_service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: musical       # DNS-имя хоста сервиса musical в Docker-сети
+                      port_value: 50052

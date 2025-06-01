@@ -1,0 +1,158 @@
+# Основной docker-compose для запуска всего проекта.
+
+services:
+
+  # PostgreSQL (один на все сервисы)
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: default_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d default_db"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+
+
+  # Redis для Auth
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  # Zookeeper для Kafka, как центральный сервер координации.
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - backend
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.2.1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092" # Доступ изнутри докера
+      - "9094:9094" # Доступ снаружи
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - backend
+
+  # Envoy, работает в качестве API Gateway
+  envoy:
+    image: envoyproxy/envoy:v1.29-latest
+    ports:
+      - "8080:8080"
+      - "9901:9901" 
+    volumes:
+      - ./src/envoy/envoy.yaml:/etc/envoy/envoy.yaml
+    networks:
+      - backend
+
+  # Auth Service
+  auth:
+    build:
+      context: .
+      dockerfile: src/auth/Dockerfile
+    ports:
+      - "50051:50051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./src/auth/config/global.config.yaml:/etc/auth/configs/config.yaml:ro
+    networks:
+      - backend
+
+  # Musical Service
+  musical:
+    build:
+      context: .
+      dockerfile: src/musical/Dockerfile
+    ports:
+      - "50052:50052"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./src/musical/configs/global.cfg.yml:/etc/musical/configs/config.yaml:ro
+    networks:
+      - backend
+
+  # Analysis Service
+  analysis:
+    build:
+      context: .
+      dockerfile: src/analysis/Dockerfile
+    command: python app/main.py
+    depends_on:
+      - kafka
+      - postgres
+    volumes:
+      - ./src/analysis/:/app
+    environment:
+      DB_URL: postgres://user:password@postgres:5432/analysis_db
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+
+networks:
+  backend:
