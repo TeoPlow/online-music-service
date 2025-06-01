@@ -17,6 +17,7 @@ from app.kafka.topics import (
 )
 
 from app.core.settings import settings
+
 from app.core.logger import get_logger
 
 log = get_logger(__name__)
@@ -25,18 +26,19 @@ fake = Faker()
 log.info("[musical] Started async fake musical producer.")
 
 try:
-    with open("../static/genres.json", "r") as f:
+    with open("./src/static/genres.json", "r") as f:
         genres = json.load(f)
 except FileNotFoundError:
-    log.error(f"File {os.getcwd()}/../static/genres.json not found.")
+    log.error(f"File {os.getcwd()}/./src/static/genres.json not found.")
     log.error("Exiting the program..")
     exit(1)
 
 
 async def send_musical_entities(num_iterations=1):
     """
-    Асинхронный Kafka Producer, который генерирует и отправляет
-    данные о музыке: артистах, альбомах, треках, а также liked-объекты.
+    Это функция с запуском фейкового асинхронного Kafka Producer,
+    который будет спамить заданное кол-во итераций автосгенерированных
+    пробросов Артистов, Треков, Альбомов, Понравившихся Треков и Артистов.
     """
     producer = AIOKafkaProducer(
         bootstrap_servers=settings.kafka.bootstrap_servers,
@@ -45,12 +47,13 @@ async def send_musical_entities(num_iterations=1):
     await producer.start()
 
     try:
-        # Загрузка стран для генерации пользователей
-        with open(f"{settings.paths.base_dir}/../static/countries.json", "r") as f:
+        # Создаю одного тестового пользователя.
+        with open(
+            f"{settings.paths.base_dir}/../static/countries.json", "r"
+        ) as f:
             countries = json.load(f)
         roles = ["user", "admin", "artist"]
 
-        # Создаем одного тестового пользователя
         user_id = str(uuid.uuid4())
         user = {
             "id": user_id,
@@ -72,7 +75,6 @@ async def send_musical_entities(num_iterations=1):
             liked_artists = []
             liked_tracks = []
 
-            # Генерация артиста
             artist_id = str(uuid.uuid4())
             artist = {
                 "id": artist_id,
@@ -86,31 +88,34 @@ async def send_musical_entities(num_iterations=1):
             }
             artists.append(artist)
 
-            # Генерация альбома
             album_id = str(uuid.uuid4())
             album = {
                 "id": album_id,
                 "title": fake.catch_phrase(),
                 "artist_id": artist_id,
-                "release_date": fake.date_this_decade().isoformat().split(".")[0],
+                "release_date": fake.date_this_decade()
+                .isoformat()
+                .split(".")[0],
             }
             albums.append(album)
 
-            # Генерация трека
             track = {
                 "id": str(uuid.uuid4()),
                 "title": fake.sentence(nb_words=3),
                 "album_id": album_id,
                 "genre": random.choice(genres),
                 "duration": random.randint(120, 420),
-                "lyrics": fake.text(max_nb_chars=100) if random.choice([True, False]) else None,
+                "lyrics": (
+                    fake.text(max_nb_chars=100)
+                    if random.choice([True, False])
+                    else None
+                ),
                 "is_explicit": random.choice([True, False]),
                 "created_at": datetime.now().isoformat().split(".")[0],
                 "updated_at": datetime.now().isoformat().split(".")[0],
             }
             tracks.append(track)
 
-            # Генерация liked-артиста
             liked_artist = {
                 "user_id": user_id,
                 "artist_id": artist_id,
@@ -118,7 +123,6 @@ async def send_musical_entities(num_iterations=1):
             }
             liked_artists.append(liked_artist)
 
-            # Генерация liked-трека
             liked_track = {
                 "user_id": user_id,
                 "track_id": track["id"],
@@ -144,7 +148,7 @@ async def send_musical_entities(num_iterations=1):
 
             for liked_artist in liked_artists:
                 await producer.send(MUSIC_LIKED_ARTISTS, liked_artist)
-                log.debug(f"[{MUSIC_LIKED_ARTISTS}] Kafka Sent: {liked_artist}")
+                log.debug(f"[{MUSIC_LIKED_ARTISTS}] Kafka Sent:{liked_artist}")
                 await asyncio.sleep(0.5)
 
             for liked_track in liked_tracks:
@@ -152,11 +156,6 @@ async def send_musical_entities(num_iterations=1):
                 log.debug(f"[{MUSIC_LIKED_TRACKS}] Kafka Sent: {liked_track}")
                 await asyncio.sleep(0.5)
 
-        return artists, albums, tracks, liked_artists, liked_tracks
-
     finally:
         await producer.stop()
-
-
-if __name__ == "__main__":
-    asyncio.run(send_musical_entities(num_iterations=1))
+    return artists, albums, tracks, liked_artists, liked_tracks
