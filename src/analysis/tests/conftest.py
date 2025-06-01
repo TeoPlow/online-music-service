@@ -8,7 +8,7 @@ async def db_pool():
     pool = await create_pool(
         host=settings.postgres.host,
         port=settings.postgres.port,
-        user="postgres",
+        user="user",
         password=settings.postgres.password,
         database=settings.postgres.database,
         min_size=1,
