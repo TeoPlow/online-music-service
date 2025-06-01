@@ -1,4 +1,4 @@
-dbconnection: postgresql://test:test@localhost:5432/test-musical
+dbconnection: "postgresql://test:test@localhost:5432/test-musical?sslmode=disable"
 
 log:
   level: debug

@@ -4,6 +4,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -21,6 +22,15 @@ type config struct {
 		SecretKey string `yaml:"secret"`
 		UseSSL    bool   `yaml:"ssl"`
 	} `yaml:"minio"`
+	Kafka KafkaConfig `yaml:"kafka"`
+}
+
+type KafkaConfig struct {
+	Brokers            []string      `yaml:"brokers"`
+	ConsumerGroup      string        `yaml:"consumer_group"`
+	Version            string        `yaml:"version"`
+	AutoCommitInterval time.Duration `yaml:"auto_commit_interval"`
+	Retries            int           `yaml:"retries"`
 }
 
 var Config config

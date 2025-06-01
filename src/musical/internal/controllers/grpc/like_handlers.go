@@ -50,6 +50,7 @@ func (s *Server) UnlikeTrack(
 
 	return &emptypb.Empty{}, nil
 }
+
 func (s *Server) LikeArtist(
 	ctx context.Context,
 	req *musicalpb.LikeArtistRequest,
@@ -69,6 +70,7 @@ func (s *Server) LikeArtist(
 
 	return &emptypb.Empty{}, nil
 }
+
 func (s *Server) UnlikeArtist(
 	ctx context.Context,
 	req *musicalpb.UnlikeArtistRequest,
@@ -88,6 +90,7 @@ func (s *Server) UnlikeArtist(
 
 	return &emptypb.Empty{}, nil
 }
+
 func (s *Server) GetLikedTracks(
 	ctx context.Context,
 	req *musicalpb.GetLikedTracksRequest,
@@ -108,6 +111,7 @@ func (s *Server) GetLikedTracks(
 
 	return resp, nil
 }
+
 func (s *Server) GetLikedArtists(
 	ctx context.Context,
 	req *musicalpb.GetLikedArtistsRequest,

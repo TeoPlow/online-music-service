@@ -59,6 +59,7 @@ linters-settings:
           - flag
           - log
           - os
+          - sync
           - os/signal
           - syscall
           - github.com/joho/godotenv 
@@ -100,6 +101,8 @@ linters-settings:
           - "github.com/georgysavva/scany/pgxscan"
           # for minio
           - "github.com/minio/minio-go/v7"
+          # for kafka
+          - "github.com/IBM/sarama"
           # internal packages
           - "github.com/TeoPlow/online-music-service/src/musical/internal"
           - "github.com/TeoPlow/online-music-service/src/musical/pkg"

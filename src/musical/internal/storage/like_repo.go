@@ -35,7 +35,6 @@ func (r *LikeRepository) LikeTrack(ctx context.Context,
             WHERE user_id = $1 AND track_id = $2
         )
     `, userID, trackID)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ErrNotExists
@@ -125,6 +124,7 @@ func (r *LikeRepository) LikeArtist(ctx context.Context,
 	}
 	return nil
 }
+
 func (r *LikeRepository) UnlikeArtist(ctx context.Context,
 	userID uuid.UUID,
 	artistID uuid.UUID,
@@ -161,7 +161,6 @@ func (repo *LikeRepository) GetLikedTracks(ctx context.Context,
         ORDER BY lt.created_at DESC
         OFFSET $2 LIMIT $3
     `, userID, offset, limit)
-
 	if err != nil {
 
 		logger.Logger.Error("failed to get liked tracks",
@@ -192,7 +191,6 @@ func (repo *LikeRepository) GetLikedArtists(ctx context.Context,
         ORDER BY la.created_at DESC
         OFFSET $2 LIMIT $3
     `, userID, offset, limit)
-
 	if err != nil {
 
 		logger.Logger.Error("failed to get liked artists",
@@ -212,7 +210,6 @@ func (repo *LikeRepository) IsTrackLiked(ctx context.Context,
 	err := repo.getExecutor(ctx).Get(ctx, &exists, `
 		SELECT EXISTS(SELECT 1 FROM liked_tracks WHERE user_id = $1 AND track_id = $2)
 	`, userID, trackID)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return false, ErrNotExists
@@ -234,7 +231,6 @@ func (repo *LikeRepository) IsArtistLiked(ctx context.Context,
 	err := repo.getExecutor(ctx).Get(ctx, &exists, `
 		SELECT EXISTS(SELECT 1 FROM liked_artists WHERE user_id = $1 AND artist_id = $2)
 	`, userID, artistID)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return false, ErrNotExists

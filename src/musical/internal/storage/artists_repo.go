@@ -23,8 +23,10 @@ func NewArtistRepo(db Executor) *ArtistRepository {
 
 func (repo *ArtistRepository) Add(ctx context.Context, artist models.Artist) error {
 	_, err := repo.getExecutor(ctx).Exec(ctx, `
-		INSERT INTO artists
+		INSERT INTO artists 
+		(id, name, author, producer, country, description, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		ON CONFLICT (id) DO NOTHING
 	`, artist.ID, artist.Name, artist.Author, artist.Producer,
 		artist.Country, artist.Description, artist.CreatedAt, artist.UpdatedAt)
 	if err != nil {
@@ -61,7 +63,7 @@ func (repo *ArtistRepository) Update(ctx context.Context, artist models.Artist) 
 			country = $5,
 			description = $6,
 			created_at = $7,
-			updated_at = $8,
+			updated_at = $8
 		WHERE id = $1
 	`, artist.ID, artist.Name, artist.Author, artist.Producer,
 		artist.Country, artist.Description, artist.CreatedAt, artist.UpdatedAt)

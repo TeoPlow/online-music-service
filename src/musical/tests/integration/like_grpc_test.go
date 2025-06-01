@@ -21,10 +21,14 @@ type LikeServiceTest struct {
 
 func (ts *LikeServiceTest) SetupTest() {
 	artistsData := []models.Artist{
-		{ID: uuid.MustParse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-			Name: "Test Artist 1"},
-		{ID: uuid.MustParse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-			Name: "Test Artist 2"},
+		{
+			ID:   uuid.MustParse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+			Name: "Test Artist 1",
+		},
+		{
+			ID:   uuid.MustParse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+			Name: "Test Artist 2",
+		},
 	}
 
 	albumsData := []models.Album{

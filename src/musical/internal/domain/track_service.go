@@ -93,7 +93,7 @@ func (service *TrackService) CreateTrack(ctx context.Context,
 	}); err != nil {
 		return models.Track{}, err
 	}
-
+	SendTrackCreate(ctx, track)
 	return track, nil
 }
 

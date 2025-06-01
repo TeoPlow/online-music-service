@@ -34,6 +34,9 @@ type AlbumService interface {
 
 type ArtistService interface {
 	GetArtist(ctx context.Context, id uuid.UUID) (models.Artist, error)
+	CreateArtist(ctx context.Context, artist models.Artist) error
+	UpdateArtist(ctx context.Context, artist models.Artist) error
+	DeleteArtist(ctx context.Context, id uuid.UUID) error
 }
 
 type LikeService interface {
@@ -43,4 +46,8 @@ type LikeService interface {
 	UnlikeArtist(ctx context.Context, userID uuid.UUID, artistID uuid.UUID) error
 	GetLikedArtists(ctx context.Context, userID uuid.UUID, req dto.GetLikedArtistsRequest) ([]models.Artist, error)
 	GetLikedTracks(ctx context.Context, userID uuid.UUID, req dto.GetLikedTracksRequest) ([]models.Track, error)
+}
+
+type KafkaMessageHandler interface {
+	HandleMessage(ctx context.Context, topic string, message []byte) error
 }

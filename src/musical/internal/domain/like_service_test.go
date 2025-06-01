@@ -268,11 +268,13 @@ func TestLikeArtist(t *testing.T) {
 			name: "success",
 			setupMocks: func(likeRepo *mocks.MockLikeRepo,
 				artistRepo *mocks.MockArtistClient,
-				txm *mocks.MockTxManager) {
+				txm *mocks.MockTxManager,
+			) {
 				txm.EXPECT().
 					RunSerializable(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(ctx context.Context,
-						fn func(context.Context) error) error {
+						fn func(context.Context) error,
+					) error {
 						return fn(ctx)
 					})
 
@@ -289,11 +291,13 @@ func TestLikeArtist(t *testing.T) {
 		{
 			name: "artist not exists",
 			setupMocks: func(likeRepo *mocks.MockLikeRepo,
-				artistRepo *mocks.MockArtistClient, txm *mocks.MockTxManager) {
+				artistRepo *mocks.MockArtistClient, txm *mocks.MockTxManager,
+			) {
 				txm.EXPECT().
 					RunSerializable(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(ctx context.Context,
-						fn func(context.Context) error) error {
+						fn func(context.Context) error,
+					) error {
 						return fn(ctx)
 					})
 
@@ -557,7 +561,8 @@ func TestUnlikeArtist(t *testing.T) {
 		{
 			name: "success",
 			setupMocks: func(likeRepo *mocks.MockLikeRepo,
-				artistRepo *mocks.MockArtistClient, txm *mocks.MockTxManager) {
+				artistRepo *mocks.MockArtistClient, txm *mocks.MockTxManager,
+			) {
 				txm.EXPECT().
 					RunSerializable(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(ctx context.Context, fn func(context.Context) error) error {
@@ -578,11 +583,13 @@ func TestUnlikeArtist(t *testing.T) {
 			name: "artist not exists",
 			setupMocks: func(likeRepo *mocks.MockLikeRepo,
 				artistRepo *mocks.MockArtistClient,
-				txm *mocks.MockTxManager) {
+				txm *mocks.MockTxManager,
+			) {
 				txm.EXPECT().
 					RunSerializable(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(ctx context.Context,
-						fn func(context.Context) error) error {
+						fn func(context.Context) error,
+					) error {
 						return fn(ctx)
 					})
 
