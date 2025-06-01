@@ -6,12 +6,10 @@ import (
 	"github.com/TeoPlow/online-music-service/src/musical/internal/config"
 )
 
-func NewSaramaProducerConfig(
-	kcfg config.KafkaConfig,
-) (*sarama.Config, error) {
+func NewSaramaProducerConfig() (*sarama.Config, error) {
 	cfg := sarama.NewConfig()
 
-	version, err := sarama.ParseKafkaVersion(kcfg.Version)
+	version, err := sarama.ParseKafkaVersion(config.Config.Kafka.Version)
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +19,8 @@ func NewSaramaProducerConfig(
 	cfg.Producer.Return.Errors = true
 	cfg.Producer.RequiredAcks = sarama.WaitForAll
 	cfg.Producer.Idempotent = true
-	cfg.Producer.Retry.Max = kcfg.Retries
+	cfg.Producer.Retry.Max = config.Config.Kafka.Retries
+	cfg.Net.MaxOpenRequests = 1
 
 	return cfg, nil
 }

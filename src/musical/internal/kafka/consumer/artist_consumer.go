@@ -10,48 +10,48 @@ import (
 	"github.com/IBM/sarama"
 
 	"github.com/TeoPlow/online-music-service/src/musical/internal/config"
-	"github.com/TeoPlow/online-music-service/src/musical/internal/controllers"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/logger"
 )
 
+type KafkaMessageHandler interface {
+	HandleMessage(ctx context.Context, topic string, message []byte) error
+	GetTopics() []string
+}
+
 type ArtistConsumer struct {
 	group   sarama.ConsumerGroup
-	handler controllers.KafkaMessageHandler
-	topics  []string
+	handler KafkaMessageHandler
 	wg      sync.WaitGroup
 }
 
 func NewArtistConsumer(
-	cfg config.KafkaConfig,
-	handler controllers.KafkaMessageHandler,
+	handler KafkaMessageHandler,
 	wg *sync.WaitGroup,
 ) (*ArtistConsumer, error) {
-	saramaCfg, err := NewSaramaConfig(cfg)
+	saramaCfg, err := NewSaramaConfig()
 	if err != nil {
 		logger.Logger.Error("failed to create sarama config",
 			slog.String("error", err.Error()),
 			slog.String("where", "NewArtistConsumer"))
 		return nil, err
 	}
-	group, err := sarama.NewConsumerGroup(cfg.Brokers, cfg.GroupID, saramaCfg)
+	group, err := sarama.NewConsumerGroup(
+		config.Config.Kafka.Brokers,
+		config.Config.Kafka.ConsumerGroup,
+		saramaCfg)
 	if err != nil {
 		logger.Logger.Error("failed to create sarama consumer group",
 			slog.String("error", err.Error()),
 			slog.String("where", "NewArtistConsumer"))
 		return nil, err
 	}
-	topics := []string{
-		cfg.Topics.ArtistCreated,
-		cfg.Topics.ArtistUpdated,
-		cfg.Topics.ArtistDeleted,
-	}
 	return &ArtistConsumer{
 		group:   group,
 		handler: handler,
-		topics:  topics,
 		wg:      sync.WaitGroup{},
 	}, nil
 }
+
 func (c *ArtistConsumer) ConsumeClaim(
 	session sarama.ConsumerGroupSession,
 	claim sarama.ConsumerGroupClaim,
@@ -80,7 +80,7 @@ func (c *ArtistConsumer) Start(ctx context.Context) error {
 				return
 			}
 
-			if err := c.group.Consume(ctx, c.topics, c); err != nil {
+			if err := c.group.Consume(ctx, c.handler.GetTopics(), c); err != nil {
 				logger.Logger.Error("failed to consume messages",
 					slog.String("error", err.Error()),
 					slog.String("where", "ArtistConsumer.Start"))

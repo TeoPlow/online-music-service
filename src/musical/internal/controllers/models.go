@@ -34,6 +34,9 @@ type AlbumService interface {
 
 type ArtistService interface {
 	GetArtist(ctx context.Context, id uuid.UUID) (models.Artist, error)
+	CreateArtist(ctx context.Context, artist models.Artist) error
+	UpdateArtist(ctx context.Context, artist models.Artist) error
+	DeleteArtist(ctx context.Context, id uuid.UUID) error
 }
 
 type LikeService interface {

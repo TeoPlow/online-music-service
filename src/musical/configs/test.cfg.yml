@@ -9,14 +9,3 @@ minio:
   access: "minioadmin"
   secret: "minioadmin123"
   ssl: false
-
-kafka:
-  brokers: ["localhost:9094"]
-  topics:
-    artist_created: "artist.created"
-    artist_updated: "artist.updated"
-    artist_deleted: "artist.deleted"
-  consumer_group: "test-consumer-group"
-  version: "2.8.0"
-  auto_commit_interval: 1s
-  group_id: "test-group-id"

@@ -14,48 +14,24 @@ import (
 	"github.com/TeoPlow/online-music-service/src/musical/internal/logger"
 )
 
-type KafkaProducer interface {
-	Publish(
-		ctx context.Context,
-		topic string,
-		key string,
-		payload []byte,
-		eventID int64,
-	) error
-	Close()
-}
-
 type SaramaProducer struct {
 	asyncProducer sarama.AsyncProducer
-	topics        struct {
-		ArtistCreated string `yaml:"artist_created"`
-		ArtistUpdated string `yaml:"artist_updated"`
-		ArtistDeleted string `yaml:"artist_deleted"`
-	}
-	wg sync.WaitGroup
+	wg            sync.WaitGroup
 }
 
-func NewSaramaProducer(
-	cfg config.KafkaConfig,
-	topics struct {
-		ArtistCreated string `yaml:"artist_created"`
-		ArtistUpdated string `yaml:"artist_updated"`
-		ArtistDeleted string `yaml:"artist_deleted"`
-	},
-) (*SaramaProducer, error) {
-	saramaCfg, err := NewSaramaProducerConfig(cfg)
+func NewSaramaProducer() (*SaramaProducer, error) {
+	saramaCfg, err := NewSaramaProducerConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	asyncProducer, err := sarama.NewAsyncProducer(cfg.Brokers, saramaCfg)
+	asyncProducer, err := sarama.NewAsyncProducer(config.Config.Kafka.Brokers, saramaCfg)
 	if err != nil {
 		return nil, err
 	}
 
 	producer := &SaramaProducer{
 		asyncProducer: asyncProducer,
-		topics:        topics,
 	}
 
 	producer.wg.Add(2)
@@ -74,7 +50,6 @@ func (p *SaramaProducer) handleSuccesses() {
 			slog.String("topic", msg.Topic),
 			slog.Int64("offset", msg.Offset),
 			slog.String("where", op))
-
 	}
 }
 
@@ -95,7 +70,6 @@ func (p *SaramaProducer) Publish(
 	topic string,
 	key string,
 	payload []byte,
-	eventID int64,
 ) error {
 	const op = "kafka.SaramaProducer.Publish"
 
@@ -111,7 +85,6 @@ func (p *SaramaProducer) Publish(
 		Topic:     topic,
 		Key:       sarama.StringEncoder(key),
 		Value:     sarama.ByteEncoder(payload),
-		Metadata:  eventID,
 		Timestamp: time.Now(),
 	}
 

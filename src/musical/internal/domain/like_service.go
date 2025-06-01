@@ -60,6 +60,7 @@ func (s *LikeService) LikeTrack(ctx context.Context, userID, trackID uuid.UUID) 
 			}
 			return ErrInternal
 		}
+		SendLikeTrack(ctx, userID, trackID)
 		return nil
 	})
 }
@@ -98,9 +99,11 @@ func (s *LikeService) LikeArtist(ctx context.Context, userID, artistID uuid.UUID
 			}
 			return ErrInternal
 		}
+		SendLikeArtist(ctx, userID, artistID)
 		return nil
 	})
 }
+
 func (s *LikeService) UnlikeArtist(ctx context.Context, userID, artistID uuid.UUID) error {
 	return s.txm.RunSerializable(ctx, func(ctx context.Context) error {
 		_, err := s.artistClient.GetArtist(ctx, artistID)
@@ -119,6 +122,7 @@ func (s *LikeService) UnlikeArtist(ctx context.Context, userID, artistID uuid.UU
 		return nil
 	})
 }
+
 func (s *LikeService) GetLikedTracks(
 	ctx context.Context,
 	userID uuid.UUID,

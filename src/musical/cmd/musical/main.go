@@ -12,11 +12,12 @@ import (
 	"time"
 
 	"github.com/TeoPlow/online-music-service/src/musical/internal/config"
-	"github.com/TeoPlow/online-music-service/src/musical/internal/controllers"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/controllers/grpc"
+	"github.com/TeoPlow/online-music-service/src/musical/internal/controllers/kafkactrl"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/db"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/domain"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/kafka/consumer"
+	"github.com/TeoPlow/online-music-service/src/musical/internal/kafka/producer"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/logger"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/storage"
 )
@@ -65,12 +66,19 @@ func main() {
 	likeRepo := storage.NewLikeRepo(tmanager.GetDatabase())
 	likes := domain.NewLikeService(likeRepo, artists, tracks, tmanager)
 	wg := &sync.WaitGroup{}
-	if err := setupKafkaConsumer(ctx, config.Config.Kafka, *artists, wg); err != nil {
+	if err := setupKafkaConsumer(ctx, artists, wg); err != nil {
 		logger.Logger.Error("failed to setup kafka consumer",
 			slog.String("error", err.Error()),
 			slog.String("where", "main.setupKafkaConsumer"))
 		return
 	}
+
+	publisher, err := producer.NewSaramaProducer()
+	if err != nil {
+		log.Panic(err)
+	}
+	defer publisher.Close()
+	domain.InitAnalyticSender(publisher)
 
 	grpcServer := grpc.NewServer(artists, albums, tracks, streaming, likes)
 
@@ -98,13 +106,12 @@ func main() {
 }
 
 func setupKafkaConsumer(ctx context.Context,
-	cfg config.KafkaConfig,
-	artistService domain.ArtistService,
+	artistService *domain.ArtistService,
 	wg *sync.WaitGroup,
 ) error {
-	kafkaHandler := controllers.NewKafkaArtistHandler(artistService, config.Config.Kafka.Topics)
+	kafkaHandler := kafkactrl.NewKafkaArtistHandler(artistService)
 
-	artistConsumer, err := consumer.NewArtistConsumer(cfg, kafkaHandler, wg)
+	artistConsumer, err := consumer.NewArtistConsumer(kafkaHandler, wg)
 	if err != nil {
 		logger.Logger.Error("failed to create artist consumer",
 			slog.String("error", err.Error()),
