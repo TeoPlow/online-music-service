@@ -147,7 +147,7 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	)
 
 	gRPCApp := grpcapp.New(cfg.GRPC.Port, jwtConfig)
-	auth.Register(gRPCApp.GetServer(), authService)
+	auth.Register(gRPCApp.GetServer(), authService, cfg)
 
 	return &App{
 		GRPCsrv:      gRPCApp,

@@ -61,7 +61,7 @@ func TestArtistRepository_Postgres(t *testing.T) {
 			ProfileID:   profileID,
 			Author:      "TheBand",
 			Producer:    "Prod",
-			Country:     "US",
+			Country:     "united states",
 			Description: "Desc",
 		}
 		err := repo.CreateArtist(ctx, art)
@@ -128,7 +128,7 @@ func TestArtistRepository_Postgres(t *testing.T) {
 			ProfileID:   profileID,
 			Author:      "UpdatedSolo",
 			Producer:    "NewProd",
-			Country:     "CA",
+			Country:     "Canada",
 			Description: "NewDesc",
 		}
 		require.NoError(t, repo.UpdateArtist(ctx, upd))

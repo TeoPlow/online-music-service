@@ -1,9 +1,45 @@
 package validation
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
+
+	"github.com/TeoPlow/online-music-service/src/auth/internal/logger"
 )
+
+var (
+	countrieOnce   sync.Once
+	countriesCache map[string]bool
+	countriesErr   error
+)
+
+func LoadCountries(staticFilePath string) (map[string]bool, error) {
+	countrieOnce.Do(func() {
+
+		filePath := filepath.Join(staticFilePath, "countries.json")
+		data, err := os.ReadFile(filePath)
+		if err != nil {
+			countriesErr = err
+			return
+		}
+		logger.Log.Info("Loading countries from:", "path", filePath)
+
+		var countries []string
+		if err := json.Unmarshal(data, &countries); err != nil {
+			countriesErr = err
+			return
+		}
+		countriesCache = make(map[string]bool)
+		for _, countryName := range countries {
+			countriesCache[strings.ToLower(countryName)] = true
+		}
+	})
+	return countriesCache, countriesErr
+}
 
 func ValidateUsername(username string) error {
 	if len(username) < 3 || len(username) > 20 {
@@ -61,6 +97,19 @@ func ValidateRole(role string) error {
 	}
 	if !validRoles[strings.ToLower(role)] {
 		return ErrInvalidRole
+	}
+	return nil
+}
+
+func ValidateCountry(country string, countries map[string]bool) error {
+	if country == "" {
+		return ErrCountryEmpty
+	}
+	if countries == nil {
+		return ErrInvalidCountry
+	}
+	if !countries[strings.ToLower(country)] {
+		return ErrInvalidCountry
 	}
 	return nil
 }

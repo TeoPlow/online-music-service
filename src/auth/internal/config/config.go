@@ -21,6 +21,7 @@ type Config struct {
 	Redis           RedisConfig   `yaml:"redis"`
 	Kafka           KafkaConfig   `yaml:"kafka"`
 	Outbox          OutboxConfig  `yaml:"outbox"`
+	StaticFilesPath string        `yaml:"static_files_path" env:"STATIC_FILES_PATH" default:"static"`
 }
 
 type RedisConfig struct {

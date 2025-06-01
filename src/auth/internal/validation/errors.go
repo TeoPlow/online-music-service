@@ -22,4 +22,6 @@ var (
 	ErrPermissionDenied         = errors.New("permission denied")
 	ErrArtistIDRequired         = errors.New("artist ID is required")
 	ErrInvalidAuthor            = errors.New("invalid author")
+	ErrInvalidCountry           = errors.New("invalid country")
+	ErrCountryEmpty             = errors.New("country cannot be empty")
 )

@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/TeoPlow/online-music-service/src/auth/internal/config"
 	"github.com/TeoPlow/online-music-service/src/auth/internal/dto"
 	"github.com/TeoPlow/online-music-service/src/auth/internal/validation"
 	authproto "github.com/TeoPlow/online-music-service/src/auth/pkg/authpb"
@@ -64,9 +65,10 @@ type serverAPI struct {
 
 func Register(gRPC *grpc.Server,
 	service AuthService,
+	cfg *config.Config,
 ) {
 	authproto.RegisterAuthServiceServer(gRPC, &serverAPI{
-		validator: validation.NewValidator(),
+		validator: validation.NewValidator(cfg),
 		service:   service,
 	})
 }
