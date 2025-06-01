@@ -1,6 +1,6 @@
 include ../../Makefile
 
-CONFIG_PATH=./configs/cfg.yml
+CONFIG_PATH=./configs/test.cfg.yml
 COMPOSE_PATH=./configs/docker-compose.yml
 MIGRATIONS_DIR=./migrations
 DB_URL=postgresql://user:password@localhost:5432/music

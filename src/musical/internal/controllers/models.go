@@ -44,3 +44,7 @@ type LikeService interface {
 	GetLikedArtists(ctx context.Context, userID uuid.UUID, req dto.GetLikedArtistsRequest) ([]models.Artist, error)
 	GetLikedTracks(ctx context.Context, userID uuid.UUID, req dto.GetLikedTracksRequest) ([]models.Track, error)
 }
+
+type KafkaMessageHandler interface {
+	HandleMessage(ctx context.Context, topic string, message []byte) error
+}

@@ -5,7 +5,6 @@ go 1.24.2
 require (
 	github.com/IBM/sarama v1.45.1
 	github.com/georgysavva/scany v1.2.3
-	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/golang/mock v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0

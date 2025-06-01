@@ -32,3 +32,38 @@ func (service *ArtistService) GetArtist(ctx context.Context, id uuid.UUID) (mode
 	}
 	return artist, nil
 }
+
+func (service *ArtistService) AddArtist(ctx context.Context, artist models.Artist) error {
+	return service.txm.RunSerializable(ctx, func(ctx context.Context) error {
+		if err := service.repo.Add(ctx, artist); err != nil {
+			if errors.Is(err, storage.ErrNotExists) {
+				return fmt.Errorf("artist %w", ErrNotFound)
+			}
+			return ErrInternal
+		}
+		return nil
+	})
+}
+func (service *ArtistService) UpdateArtist(ctx context.Context, artist models.Artist) error {
+	return service.txm.RunSerializable(ctx, func(ctx context.Context) error {
+		if err := service.repo.Update(ctx, artist); err != nil {
+			if errors.Is(err, storage.ErrNotExists) {
+				return fmt.Errorf("artist %w", ErrNotFound)
+			}
+			return ErrInternal
+		}
+		return nil
+	})
+}
+
+func (service *ArtistService) DeleteArtist(ctx context.Context, id uuid.UUID) error {
+	return service.txm.RunSerializable(ctx, func(ctx context.Context) error {
+		if err := service.repo.Delete(ctx, id); err != nil {
+			if errors.Is(err, storage.ErrNotExists) {
+				return fmt.Errorf("artist %w", ErrNotFound)
+			}
+			return ErrInternal
+		}
+		return nil
+	})
+}
