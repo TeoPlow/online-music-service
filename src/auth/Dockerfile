@@ -14,6 +14,16 @@ WORKDIR /app
 
 COPY --from=builder /app/auth .
 
+RUN mkdir -p /app/static
+COPY --from=builder /app/src/static /app/static
+ENV STATIC_FILES_PATH=/app/static
+RUN mkdir -p /etc/auth/configs
+
+COPY --from=builder /app/src/auth/config/config.yaml /etc/auth/configs/
+
+RUN ls -la /app/static/
+RUN ls -la /etc/auth/configs/
+
 EXPOSE 50051
 
 CMD ["./auth", "--path", "/etc/auth/configs/config.yaml"]

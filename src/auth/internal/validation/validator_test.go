@@ -1,16 +1,66 @@
 package validation
 
 import (
+	"encoding/json"
+	"io"
+	"log/slog"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
 	"testing"
 
+	"github.com/TeoPlow/online-music-service/src/auth/internal/config"
+	"github.com/TeoPlow/online-music-service/src/auth/internal/logger"
 	auth "github.com/TeoPlow/online-music-service/src/auth/pkg/authpb"
 )
 
 func TestValidateRegisterUserRequest(t *testing.T) {
+	tempDir := t.TempDir()
+	if logger.Log == nil {
+		logger.Log = slog.New(slog.NewTextHandler(io.Discard, nil))
+	}
+
+	testCountries := []string{"russia", "united states of america", "germany", "france"}
+	jsonData, err := json.Marshal(testCountries)
+	if err != nil {
+		t.Fatalf("Failed to marshal test countries: %v", err)
+	}
+
+	staticDir := filepath.Join(tempDir, "static")
+	if err := os.MkdirAll(staticDir, 0755); err != nil {
+		t.Fatalf("Failed to create static directory: %v", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(staticDir, "countries.json"), jsonData, 0644); err != nil {
+		t.Fatalf("Failed to write test countries file: %v", err)
+	}
+
+	countrieOnce = sync.Once{}
+	countriesCache = nil
+	countriesErr = nil
+
+	cfg := &config.Config{
+		StaticFilesPath: staticDir,
+	}
+	countries, err := LoadCountries(cfg.StaticFilesPath)
+	if err != nil {
+		t.Fatalf("Failed to load countries: %v", err)
+	}
+	if len(countries) == 0 {
+		t.Fatal("No countries loaded, expected at least one country")
+	}
+
+	var validCountry string
+	for country := range countries {
+		validCountry = country
+		break
+	}
 	tests := []struct {
-		name    string
-		req     *auth.RegisterUserRequest
-		wantErr bool
+		name      string
+		req       *auth.RegisterUserRequest
+		countries map[string]bool
+		wantErr   bool
 	}{
 		{
 			name: "valid request",
@@ -19,10 +69,11 @@ func TestValidateRegisterUserRequest(t *testing.T) {
 				Email:    "test@example.com",
 				Password: "Password123!",
 				Gender:   true,
-				Country:  "RU",
+				Country:  validCountry,
 				Age:      25,
 			},
-			wantErr: false,
+			countries: countries,
+			wantErr:   false,
 		},
 		{
 			name: "invalid username",
@@ -34,6 +85,8 @@ func TestValidateRegisterUserRequest(t *testing.T) {
 				Country:  "RU",
 				Age:      25,
 			},
+			countries: countries,
+
 			wantErr: true,
 		},
 		{
@@ -46,6 +99,8 @@ func TestValidateRegisterUserRequest(t *testing.T) {
 				Country:  "RU",
 				Age:      25,
 			},
+			countries: countries,
+
 			wantErr: true,
 		},
 		{
@@ -58,6 +113,8 @@ func TestValidateRegisterUserRequest(t *testing.T) {
 				Country:  "RU",
 				Age:      25,
 			},
+			countries: countries,
+
 			wantErr: true,
 		},
 		{
@@ -70,13 +127,15 @@ func TestValidateRegisterUserRequest(t *testing.T) {
 				Country:  "RU",
 				Age:      -1,
 			},
+			countries: countries,
+
 			wantErr: true,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := ValidateRegisterUserRequest(test.req)
+			err := ValidateRegisterUserRequest(test.req, test.countries)
 			if (err != nil) != test.wantErr {
 				t.Errorf("ValidateRegisterRequest() = %v, want %v", err, test.wantErr)
 			}
@@ -520,5 +579,118 @@ func TestValidateRegistrationRole(t *testing.T) {
 				t.Errorf("ValidateRegistrationRole(%q) = %v, want %v", test.role, err, test.wantErr)
 			}
 		})
+	}
+}
+func TestValidateCountry(t *testing.T) {
+	countries := map[string]bool{
+		"russia":                   true,
+		"united states of america": true,
+		"germany":                  true,
+		"france":                   true,
+	}
+
+	tests := []struct {
+		name    string
+		country string
+		wantErr bool
+	}{
+		{
+			name:    "valid country",
+			country: "russia",
+			wantErr: false,
+		},
+		{
+			name:    "valid country mixed case",
+			country: "Russia",
+			wantErr: false,
+		},
+		{
+			name:    "valid country uppercase",
+			country: "RUSSIA",
+			wantErr: false,
+		},
+		{
+			name:    "valid country with spaces",
+			country: "united states of america",
+			wantErr: false,
+		},
+		{
+			name:    "invalid country",
+			country: "not-a-country",
+			wantErr: true,
+		},
+		{
+			name:    "empty country",
+			country: "",
+			wantErr: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := ValidateCountry(test.country, countries)
+			if (err != nil) != test.wantErr {
+				t.Errorf("ValidateCountry(%q) = %v, want error: %v", test.country, err, test.wantErr)
+			}
+		})
+	}
+
+	t.Run("nil countries map", func(t *testing.T) {
+		err := ValidateCountry("russia", nil)
+		if err == nil {
+			t.Errorf("Expected error with nil countries map, got nil")
+		}
+	})
+}
+
+func TestLoadCountries(t *testing.T) {
+	if logger.Log == nil {
+		logger.Log = slog.New(slog.NewTextHandler(io.Discard, nil))
+	}
+
+	countrieOnce = sync.Once{}
+	countriesCache = nil
+	countriesErr = nil
+	cfg := &config.Config{
+		StaticFilesPath: t.TempDir(),
+	}
+	countriesJSON := `["russia", "united states of america", "germany", "france"]`
+	if err := os.WriteFile(filepath.Join(cfg.StaticFilesPath, "countries.json"),
+		[]byte(countriesJSON), 0644); err != nil {
+		t.Fatalf("Failed to write countries.json: %v", err)
+	}
+	countries, err := LoadCountries(cfg.StaticFilesPath)
+	if err != nil {
+		t.Fatalf("LoadCountries() error = %v", err)
+	}
+	if len(countries) == 0 {
+		t.Fatal("LoadCountries() returned empty map, expected at least one country")
+	}
+
+	expectedCountries := []string{"russia", "united states of america", "germany", "france"}
+	for _, country := range expectedCountries {
+		foundCountry := false
+		for actualCountry := range countries {
+			if strings.EqualFold(actualCountry, country) {
+				foundCountry = true
+				break
+			}
+		}
+		if !foundCountry {
+			t.Logf("Note: Expected country %q not found in loaded countries.", country)
+		}
+	}
+
+	var someCountry string
+	for country := range countries {
+		someCountry = country
+		break
+	}
+
+	if someCountry != "" {
+		upperCountry := strings.ToUpper(someCountry)
+		if err := ValidateCountry(upperCountry, countries); err != nil {
+			t.Errorf("ValidateCountry() failed for uppercase variant of %q: %v", someCountry, err)
+		}
 	}
 }

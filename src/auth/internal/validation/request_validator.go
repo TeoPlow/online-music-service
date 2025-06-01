@@ -7,7 +7,7 @@ import (
 	auth "github.com/TeoPlow/online-music-service/src/auth/pkg/authpb"
 )
 
-func ValidateRegisterUserRequest(req *auth.RegisterUserRequest) error {
+func ValidateRegisterUserRequest(req *auth.RegisterUserRequest, countries map[string]bool) error {
 	if err := ValidateUsername(req.GetUsername()); err != nil {
 		return err
 	}
@@ -17,11 +17,20 @@ func ValidateRegisterUserRequest(req *auth.RegisterUserRequest) error {
 	if err := ValidatePassword(req.GetPassword()); err != nil {
 		return err
 	}
+	if err := ValidateCountry(req.GetCountry(), countries); err != nil {
+		return err
+	}
 	return ValidateAge(req.GetAge())
 }
 
-func ValidateRegisterArtistRequest(req *auth.RegisterArtistRequest) error {
+func ValidateRegisterArtistRequest(req *auth.RegisterArtistRequest, countries map[string]bool) error {
 	if err := ValidateUsername(req.GetUsername()); err != nil {
+		return err
+	}
+	if err := ValidateAuthor(req.GetAuthor()); err != nil {
+		return err
+	}
+	if err := ValidateCountry(req.GetCountry(), countries); err != nil {
 		return err
 	}
 

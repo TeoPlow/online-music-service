@@ -63,7 +63,7 @@ func TestUserRepository_Postgres(t *testing.T) {
 		ProfileID: profileID,
 		Email:     "test@example.com",
 		Gender:    true,
-		Country:   "RU",
+		Country:   "Russia",
 		Age:       25,
 	}
 	_, err = db.Exec(ctx, `
@@ -89,7 +89,7 @@ func TestUserRepository_Postgres(t *testing.T) {
 			ProfileID: newProfile.ID,
 			Email:     "new@example.com",
 			Gender:    false,
-			Country:   "US",
+			Country:   "united States",
 			Age:       30,
 		}
 		require.NoError(t, repo.CreateUser(ctx, newUser))
@@ -144,14 +144,14 @@ func TestUserRepository_Postgres(t *testing.T) {
 			ProfileID: userProfile.ID,
 			Email:     user.Email,
 			Gender:    user.Gender,
-			Country:   "DE",
+			Country:   "Russia",
 			Age:       28,
 		}
 		require.NoError(t, repo.UpdateUser(ctx, update))
 
 		got, err := repo.GetUserByID(ctx, userProfile.ID.String())
 		require.NoError(t, err)
-		assert.Equal(t, "DE", got.Country)
+		assert.Equal(t, "Russia", got.Country)
 		assert.Equal(t, int32(28), got.Age)
 		assert.Equal(t, userProfile.ID, got.ID)
 		assert.Equal(t, userProfile.Username, got.Username)
