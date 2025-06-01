@@ -67,7 +67,7 @@ func (service *AlbumService) CreateAlbum(ctx context.Context, req dto.CreateAlbu
 	}); err != nil {
 		return models.Album{}, err
 	}
-
+	SendAlbumCreate(ctx, album)
 	return album, nil
 }
 

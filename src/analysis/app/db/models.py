@@ -24,7 +24,7 @@ class User(BaseModel):
 
         async with pool.acquire() as conn:
             query = """
-                SELECT * FROM music_streaming.users
+                SELECT * FROM users
                 WHERE id = $1
                 ORDER BY updated_at DESC LIMIT 1
             """
@@ -63,7 +63,7 @@ class Track(BaseModel):
 
         async with pool.acquire() as conn:
             query = """
-                SELECT * FROM music_streaming.tracks
+                SELECT * FROM tracks
                 WHERE id = $1
                 ORDER BY updated_at DESC LIMIT 1
             """
@@ -99,7 +99,7 @@ class Album(BaseModel):
 
         async with pool.acquire() as conn:
             query = """
-                SELECT * FROM music_streaming.albums
+                SELECT * FROM albums
                 WHERE id = $1
                 ORDER BY updated_at DESC LIMIT 1
             """
@@ -137,7 +137,7 @@ class Artist(BaseModel):
 
         async with pool.acquire() as conn:
             query = """
-                SELECT * FROM music_streaming.artists
+                SELECT * FROM artists
                 WHERE id = $1
                 ORDER BY updated_at DESC LIMIT 1
             """
@@ -170,7 +170,7 @@ class Event(BaseModel):
 
         async with pool.acquire() as conn:
             query = """
-                SELECT * FROM music_streaming.events
+                SELECT * FROM events
                 WHERE id = $1
                 ORDER BY updated_at DESC LIMIT 1
             """
@@ -198,7 +198,7 @@ class LikedArtist(BaseModel):
         async with pool.acquire() as conn:
             result = await conn.fetchrow(
                 """
-                SELECT * FROM music_streaming.liked_artists
+                SELECT * FROM liked_artists
                 WHERE user_id = $1 AND artist_id = $2
                 LIMIT 1
             """,
@@ -221,7 +221,7 @@ class LikedTrack(BaseModel):
         async with pool.acquire() as conn:
             result = await conn.fetchrow(
                 """
-                SELECT * FROM music_streaming.liked_tracks
+                SELECT * FROM liked_tracks
                 WHERE user_id = $1 AND track_id = $2
                 LIMIT 1
             """,

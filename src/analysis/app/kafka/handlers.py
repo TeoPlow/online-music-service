@@ -40,7 +40,7 @@ async def handle_auth_users(message: dict):
         async with client.acquire() as conn:
             await conn.execute(
                 """
-                INSERT INTO music_streaming.users
+                INSERT INTO users
                 (id, username, gender, country,
                 age, role, created_at, updated_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -78,7 +78,7 @@ async def handler_music_liked_tracks(message: dict):
         async with client.acquire() as conn:
             await conn.execute(
                 """
-                INSERT INTO music_streaming.liked_tracks
+                INSERT INTO liked_tracks
                 (user_id, track_id)
                 VALUES ($1, $2)
                 ON CONFLICT (user_id, track_id) DO NOTHING
@@ -103,7 +103,7 @@ async def handler_music_liked_artists(message: dict):
         async with client.acquire() as conn:
             await conn.execute(
                 """
-                INSERT INTO music_streaming.liked_artists
+                INSERT INTO liked_artists
                 (user_id, artist_id)
                 VALUES ($1, $2)
                 ON CONFLICT (user_id, artist_id) DO NOTHING
@@ -135,7 +135,7 @@ async def handle_music_artists(message: dict):
         async with client.acquire() as conn:
             await conn.execute(
                 """
-                INSERT INTO music_streaming.artists
+                INSERT INTO artists
                 (id, name, author, producer, country,
                 description, created_at, updated_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -165,19 +165,23 @@ async def handle_music_albums(message: dict):
     try:
         client = await get_db_client()
 
+        release_datetime = datetime.fromisoformat(
+            message["release_date"].replace("Z", "+00:00"))
+        release_date = release_datetime.date()
+
         album_id = UUID(message["id"])
         album = Album(
             id=album_id,
             title=message["title"],
             artist_id=UUID(message["artist_id"]),
-            release_date=message["release_date"],
+            release_date=release_date,
             updated_at=datetime.now(),
         )
 
         async with client.acquire() as conn:
             await conn.execute(
                 """
-                INSERT INTO music_streaming.albums
+                INSERT INTO albums
                 (id, title, artist_id, release_date, updated_at)
                 VALUES ($1, $2, $3, $4, $5)
                 ON CONFLICT (id) DO UPDATE SET
@@ -217,7 +221,7 @@ async def handle_music_tracks(message: dict):
         async with client.acquire() as conn:
             await conn.execute(
                 """
-                INSERT INTO music_streaming.tracks
+                INSERT INTO tracks
                 (id, title, album_id, genre, duration,
                 lyrics, is_explicit, created_at, updated_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -262,7 +266,7 @@ async def handle_event(message: dict):
         async with client.acquire() as conn:
             await conn.execute(
                 """
-                INSERT INTO music_streaming.events
+                INSERT INTO events
                 (event_time, user_id, track_id)
                 VALUES ($1, $2, $3)
                 ON CONFLICT (user_id, track_id) DO NOTHING

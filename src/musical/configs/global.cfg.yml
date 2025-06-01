@@ -9,3 +9,10 @@ minio:
   access: "minioadmin"
   secret: "minioadmin123"
   ssl: false
+
+kafka:
+  brokers: ["kafka:9092"]
+  consumer_group: "musical-consumer-group"
+  version: 2.8.0
+  auto_commit_interval: 1s
+  retries: 5

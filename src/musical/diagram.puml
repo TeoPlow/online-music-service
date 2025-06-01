@@ -9,31 +9,27 @@ package internal/controllers {
         -likedService
         -streamingService
     }
-    class HTTPServer {
-        -trackService
-        -albumService
+    class KafkaConsumer {
         -artistService
-        -likedService
-        -streamingService
     }
 }
 
 package internal/domain {
     class TrackService {
-        -albumDelegate: AlbumService
-        -streamingDelegate: StreamingService
+        -albumClient: AlbumService
+        -streamingClient: StreamingService
         -trackRepo: TrackRepository
     }
     class AlbumService {
-        -artistDelegate: ArtistService
+        -artistClient: ArtistService
         -albumRepo: AlbumRepository
     }
     class ArtistService {
         -artistRepo: ArtistRepository
     }
     class LikedService {
-        -trackDelegate: TrackService
-        -artistDelegate: ArtistService
+        -trackClient: TrackService
+        -artistClient: ArtistService
         -likedRepo: LikedRepository
     }
     class StreamingService {
@@ -44,27 +40,27 @@ package internal/domain {
 package internal/storage {
     class TrackRepository {
         -db: Postgres
-        -cache: Redis (если нужен)
+        -cache: Redis
     }
     class AlbumRepository {
         -db: Postgres
-        -cache: Redis (если нужен)
+        -cache: Redis
     }
     class ArtistRepository {
         -db: Postgres
-        -cache: Redis (если нужен)
+        -cache: Redis
     }
     class LikedRepository {
         -db: Postgres
-        -cache: Redis (если нужен)
+        -cache: Redis
     }
-    class StreamingRepository {
+    class FileStorage {
         -db: MiniO
     }
 }
 
 "GRPCServer" ====> "internal/domain"
-"HTTPServer" ====> "internal/domain"
+"KafkaConsumer" ====> "internal/domain"
 
 "TrackService" .> "AlbumService"
 "TrackService" .> "StreamingService"
@@ -79,5 +75,5 @@ package internal/storage {
 "LikedService" .> "TrackService"
 "LikedService" --> "LikedRepository"
 
-"StreamingService" --> "StreamingRepository"
+"StreamingService" --> "FileStorage"
 @enduml

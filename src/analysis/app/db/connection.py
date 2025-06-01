@@ -18,7 +18,7 @@ async def get_db_client():
         _db_pool = await create_pool(
             host=settings.postgres.host,
             port=settings.postgres.port,
-            user="postgres",
+            user=settings.postgres.user,
             password=settings.postgres.password,
             database=settings.postgres.database,
             min_size=1,
