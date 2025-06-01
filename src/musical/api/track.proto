@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package musical;
+
+option go_package = "github.com/TeoPlow/online-music-service/src/musical/pkg/musicalpb";
+
+import "google/protobuf/timestamp.proto";
+
+message Track {
+    string id = 1;
+    string title = 2;
+    string album_id = 3;
+    string genre = 4;
+    int32 duration = 5;  // in seconds
+    optional string lyrics = 6;
+    bool is_explicit = 7;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
+}
+
+message TrackInfo {
+    string title = 1;
+    string album_id = 2;
+    string genre = 3;
+    int32 duration = 4;
+    optional string lyrics = 5;
+    bool is_explicit = 6;
+}
+
+message CreateTrackRequest {
+    oneof data {
+        TrackInfo metadata = 1;
+        bytes chunk = 2;
+    }
+}
+
+message DownloadResponse {
+    bytes chunk = 1;
+}
+
+message UpdateTrackRequest {
+    string id = 1;
+    optional string title = 2;
+    optional string album_id = 3;
+    optional string genre = 4;
+    optional int32 duration = 5;
+    optional string lyrics = 6;
+    optional bool is_explicit = 7;
+}
+
+message ListTracksRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+    optional string album_id = 3;  // Filter by album
+    optional string genre = 4;  // Filter by genre
+    optional string search_query = 5;
+}
+
+message ListTracksResponse {
+    repeated Track tracks = 1;
+}

@@ -3,6 +3,8 @@
 .vscode/
 
 bin/
+logs.json
+logs/
 
 __pycache__/
 

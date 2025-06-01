@@ -1,7 +1,6 @@
-SERVICES := musical auth_service analysis # Сюда пишем название папки сервиса через пробел
+SERVICES := musical auth analysis # Сюда пишем название папки сервиса через пробел
 
 PYENV=python -m 
-
 
 # Go tasks
 .PHONY: go-lint
@@ -21,6 +20,7 @@ go-deps:
 	go install github.com/golang/mock/mockgen@latest
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
 	go mod tidy
 
 .PHONY: go-fmt
@@ -58,41 +58,80 @@ test:
 		echo "Running tests only for $(SERVICE)..."; \
 		echo "=> Starting dependencies for $(SERVICE)..."; \
 		(cd ./src/$(SERVICE) && $(MAKE) -s test-deps-up) || echo "No test-deps-up for $(SERVICE)"; \
+		exit_code=0; \
 		echo "=> Running Go tests..."; \
 		if find ./src/$(SERVICE) -type f -name '*.go' | grep -q .; then \
-			go test -v ./src/$(SERVICE)/... || exit 1; \
+			go test -v ./src/$(SERVICE)/... || exit_code=1; \
 		else \
 			echo "No Go files found in ./src/$(SERVICE)."; \
 		fi; \
 		echo "=> Running Python tests..."; \
 		if find ./src/$(SERVICE) -type f -name '*_test.py' | grep -q .; then \
-			pytest ./src/$(SERVICE) || exit 1; \
+			pytest ./src/$(SERVICE) || exit_code=1; \
 		else \
 			echo "No Python tests found in ./src/$(SERVICE)."; \
 		fi; \
 		echo "=> Stopping dependencies..."; \
 		(cd ./src/$(SERVICE) && $(MAKE) -s test-deps-down) || echo "No test-deps-down for $(SERVICE)"; \
+		exit $$exit_code; \
 	else \
 		echo "Running tests for all services..."; \
-		for service in $(SERVICES); do ( \
+		final_exit_code=0; \
+		for service in $(SERVICES); do { \
+			service_exit_code=0; \
 			echo "=> Starting dependencies for $$service..."; \
 			(cd ./src/$$service && $(MAKE) -s test-deps-up) || echo "No test-deps-up for $$service"; \
 			echo "=> Running Go tests for $$service..."; \
 			if find ./src/$$service -type f -name '*.go' | grep -q .; then \
-				go test -v ./src/$$service/... || exit 1; \
+				go test -v ./src/$$service/... || service_exit_code=1; \
 			else \
 				echo "No Go files found in ./src/$$service."; \
 			fi; \
 			echo "=> Running Python tests for $$service..."; \
 			if find ./src/$$service -type f -name '*_test.py' | grep -q .; then \
-				pytest ./src/$$service || exit 1; \
+				pytest ./src/$$service || service_exit_code=1; \
 			else \
 				echo "No Python tests found in ./src/$$service."; \
 			fi; \
 			echo "=> Stopping dependencies for $$service..."; \
 			(cd ./src/$$service && $(MAKE) -s test-deps-down) || echo "No test-deps-down for $$service"; \
-		); done; \
+			if [ $$service_exit_code -ne 0 ]; then final_exit_code=1; fi \
+		}; done; \
+		exit $$final_exit_code; \
 	fi
+
+# Run All
+
+.PHONY: compose-up-all
+compose-up-all:
+	@docker compose up -d
+	@mkdir -p logs
+	@nohup docker compose logs -f > logs/all.log 2>&1 & echo $$! > logs/.logs.pid
+
+.PHONY: compose-down-all
+compose-down-all:
+	@if [ -f logs/.logs.pid ]; then \
+		echo "Stopping logging (PID=$$(cat logs/.logs.pid))"; \
+		kill $$(cat logs/.logs.pid) && rm -f logs/.logs.pid; \
+	else \
+		echo "No log process found."; \
+	fi
+	@docker compose down
+
+.PHONY: migrate-up-all
+migrate-up-all:
+	@for service in $(SERVICES); do { \
+		echo "=> Starting migration for $$service"; \
+		(cd ./src/$$service && $(MAKE) -s migrate-up \
+			DB_URL=postgresql://user:password@localhost:5432/$${service}_db) || \
+		echo "No migrate-up for $$service"; \
+	}; done \
+
+.PHONY: run-all
+run-all: compose-up-all migrate-up-all
+
+.PHONY: stop-all
+stop-all: compose-down-all
 
 .PHONY: help
 help:
@@ -120,3 +159,6 @@ help:
 	@echo "                Usage: make test SERVICE=<service-name>"
 	@echo "                It is required that the commands 'make test-deps-up'"
 	@echo "                and 'make test-deps-down' are executed inside the service folder"
+	@echo "Running All services:"
+	@echo "  run-all       Run all services from docker-compose.yml and make migrations for them."
+	@echo "  stop-all      Stop all services from docker-compose.yml"

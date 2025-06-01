@@ -4,6 +4,8 @@ CONFIG_PATH=./config.yml
 COMPOSE_PATH=./docker-compose.yml
 TESTS_PATH=./tests
 SUPERSET_COMPOSE_PATH=./superset/docker-compose-image-tag.yml
+MIGRATIONS_DIR=./app/db/migrations/sql
+DB_URL=postgres://user:password@localhost:5432/analysis_db
 
 .PHONY: setup-venv start-services stop-services remove-volumes postgres-shell
 
@@ -53,6 +55,11 @@ service-logs:
 run-tests:
 	@echo "Starting tests..."
 	pytest ${TESTS_PATH}
+
+# Миграции
+.PHONY: migrate-up
+migrate-up:
+	goose -dir $(MIGRATIONS_DIR) postgres "$(DB_URL)" up
 
 # Для системы CI Евгеновской
 test-deps-up: start-services

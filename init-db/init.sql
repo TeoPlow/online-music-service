@@ -1,0 +1,7 @@
+CREATE DATABASE auth_db;
+CREATE DATABASE musical_db;
+CREATE DATABASE analysis_db;
+
+CREATE ROLE postgres WITH LOGIN PASSWORD 'password';
+ALTER ROLE postgres CREATEDB;
+GRANT ALL PRIVILEGES ON DATABASE analysis_db TO postgres;

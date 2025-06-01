@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package musical;
+
+option go_package = "github.com/TeoPlow/online-music-service/src/musical/pkg/musicalpb";
+
+import "artist.proto";
+import "track.proto";
+
+message LikeArtistRequest {
+    string artist_id = 2;
+}
+
+message UnlikeArtistRequest {
+    string artist_id = 2;
+}
+
+message GetLikedArtistsRequest {
+    int32 page = 2;
+    int32 page_size = 3;
+}
+
+message GetLikedArtistsResponse {
+    repeated Artist artists = 1;
+}
+
+message LikeTrackRequest {
+    string track_id = 2;
+}
+
+message UnlikeTrackRequest {
+    string track_id = 2;
+}
+
+message GetLikedTracksRequest {
+    int32 page = 2;
+    int32 page_size = 3;
+}
+
+message GetLikedTracksResponse {
+    repeated Track tracks = 1;
+    int32 total_count = 2;
+}
