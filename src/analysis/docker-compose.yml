@@ -54,3 +54,9 @@ services:
 
 volumes:
   postgres_data:
+  superset_home:
+
+networks:
+  default:
+    external:
+      name: music_net
