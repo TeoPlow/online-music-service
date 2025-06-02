@@ -15,6 +15,7 @@ import (
 	"github.com/TeoPlow/online-music-service/src/musical/internal/controllers/grpc"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/controllers/kafkactrl"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/db"
+	"github.com/TeoPlow/online-music-service/src/musical/internal/db/cache"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/domain"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/kafka/consumer"
 	"github.com/TeoPlow/online-music-service/src/musical/internal/kafka/producer"
@@ -41,6 +42,12 @@ func main() {
 	}
 	defer tmanager.GetDatabase().Close()
 
+	redis, err := cache.NewRedisCache(ctx)
+	if err != nil {
+		logger.Logger.Error(err.Error())
+	}
+	defer redis.Close()
+
 	minio, err := storage.NewMinIOClient(ctx, "audio")
 	if err != nil {
 		log.Panic(err)
@@ -52,15 +59,15 @@ func main() {
 			slog.String("where", "main.NewSaramaProducer"))
 		return
 	}
-	artistRepo := storage.NewArtistRepo(tmanager.GetDatabase())
+	artistRepo := storage.NewArtistRepo(tmanager.GetDatabase(), redis)
 	artists := domain.NewArtistService(artistRepo, tmanager)
 
-	albumRepo := storage.NewAlbumRepo(tmanager.GetDatabase())
+	albumRepo := storage.NewAlbumRepo(tmanager.GetDatabase(), redis)
 	albums := domain.NewAlbumService(albumRepo, tmanager, artists)
 
 	streaming := domain.NewStreamingService(minio)
 
-	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase())
+	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase(), redis)
 	tracks := domain.NewTrackService(trackRepo, tmanager, albums, streaming)
 
 	likeRepo := storage.NewLikeRepo(tmanager.GetDatabase())

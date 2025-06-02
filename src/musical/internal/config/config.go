@@ -22,7 +22,8 @@ type config struct {
 		SecretKey string `yaml:"secret"`
 		UseSSL    bool   `yaml:"ssl"`
 	} `yaml:"minio"`
-	Kafka KafkaConfig `yaml:"kafka"`
+	Kafka     KafkaConfig `yaml:"kafka"`
+	RedisConn string      `yaml:"redisurl"`
 }
 
 type KafkaConfig struct {
