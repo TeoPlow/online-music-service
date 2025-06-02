@@ -15,12 +15,18 @@ import (
 	"github.com/TeoPlow/online-music-service/src/musical/internal/models"
 )
 
+const cacheAlbum = "album"
+
 type AlbumRepository struct {
 	repository
 }
 
-func NewAlbumRepo(db Executor) *AlbumRepository {
-	return &AlbumRepository{repository{db}}
+func NewAlbumRepo(db Executor, cache Cache) *AlbumRepository {
+	if cache == nil {
+		logger.Logger.Warn("no cache for repository",
+			slog.String("where", "NewAlbumRepo"))
+	}
+	return &AlbumRepository{repository{db, cache}}
 }
 
 func (repo *AlbumRepository) Add(ctx context.Context, album models.Album) error {
@@ -34,6 +40,7 @@ func (repo *AlbumRepository) Add(ctx context.Context, album models.Album) error 
 			slog.String("where", "AlbumRepository.Add"))
 		return ErrSQL
 	}
+	repo.updateCache(ctx, cacheAlbum, album.ID, album)
 	return nil
 }
 
@@ -49,6 +56,7 @@ func (repo *AlbumRepository) Delete(ctx context.Context, id uuid.UUID) error {
 			slog.String("where", "AlbumRepository.Delete"))
 		return ErrSQL
 	}
+	repo.clearCache(ctx, cacheAlbum, id)
 	return nil
 }
 
@@ -70,11 +78,15 @@ func (repo *AlbumRepository) Update(ctx context.Context, album models.Album) err
 			slog.String("where", "AlbumRepository.Update"))
 		return ErrSQL
 	}
+	repo.updateCache(ctx, cacheAlbum, album.ID, album)
 	return nil
 }
 
 func (repo *AlbumRepository) GetByID(ctx context.Context, id uuid.UUID) (models.Album, error) {
 	var res models.Album
+	if ok := repo.checkCache(ctx, cacheAlbum, id, &res); ok {
+		return res, nil
+	}
 	err := repo.getExecutor(ctx).Get(ctx, &res, `
 		SELECT *
 		FROM albums
@@ -89,6 +101,7 @@ func (repo *AlbumRepository) GetByID(ctx context.Context, id uuid.UUID) (models.
 			slog.String("where", "AlbumRepository.GetByID"))
 		return models.Album{}, fmt.Errorf("AlbumRepository.GetByID: %w", ErrSQL)
 	}
+	repo.updateCache(ctx, cacheAlbum, id, res)
 	return res, nil
 }
 

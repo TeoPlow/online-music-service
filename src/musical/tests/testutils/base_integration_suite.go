@@ -55,17 +55,17 @@ func (s *BaseIntegrationSuite) SetupSuite() {
 	tmanager, err := db.NewTxManager(s.ctx)
 	s.Require().NoError(err)
 
-	artistRepo := storage.NewArtistRepo(tmanager.GetDatabase())
+	artistRepo := storage.NewArtistRepo(tmanager.GetDatabase(), nil)
 	artistService := domain.NewArtistService(artistRepo, tmanager)
 
-	albumRepo := storage.NewAlbumRepo(tmanager.GetDatabase())
+	albumRepo := storage.NewAlbumRepo(tmanager.GetDatabase(), nil)
 	albumService := domain.NewAlbumService(albumRepo, tmanager, artistService)
 
 	minio, err := storage.NewMinIOClient(s.ctx, "test")
 	s.Require().NoError(err)
 	streamingService := domain.NewStreamingService(minio)
 
-	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase())
+	trackRepo := storage.NewTrackRepo(tmanager.GetDatabase(), nil)
 	trackService := domain.NewTrackService(trackRepo, tmanager, albumService, streamingService)
 
 	likeRepo := storage.NewLikeRepo(tmanager.GetDatabase())

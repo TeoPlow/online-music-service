@@ -17,6 +17,8 @@ import (
 	"github.com/TeoPlow/online-music-service/src/musical/internal/models"
 )
 
+const cacheTrack = "track"
+
 type trackForDB struct {
 	ID         uuid.UUID      `db:"id"`
 	Title      string         `db:"title"`
@@ -70,8 +72,12 @@ type TrackRepository struct {
 	repository
 }
 
-func NewTrackRepo(db Executor) *TrackRepository {
-	return &TrackRepository{repository{db}}
+func NewTrackRepo(db Executor, cache Cache) *TrackRepository {
+	if cache == nil {
+		logger.Logger.Warn("no cache for repository",
+			slog.String("where", "NewTrackRepo"))
+	}
+	return &TrackRepository{repository{db, cache}}
 }
 
 func (repo *TrackRepository) Add(ctx context.Context, t models.Track) error {
@@ -88,6 +94,7 @@ func (repo *TrackRepository) Add(ctx context.Context, t models.Track) error {
 			slog.String("where", "TrackRepository.Add"))
 		return ErrSQL
 	}
+	repo.updateCache(ctx, cacheTrack, t.ID, t)
 	return nil
 }
 
@@ -103,6 +110,7 @@ func (repo *TrackRepository) Delete(ctx context.Context, id uuid.UUID) error {
 			slog.String("where", "TrackRepository.Delete"))
 		return ErrSQL
 	}
+	repo.clearCache(ctx, cacheTrack, id)
 	return nil
 }
 
@@ -131,12 +139,19 @@ func (repo *TrackRepository) Update(ctx context.Context, t models.Track) error {
 			slog.String("where", "TrackRepository.Update"))
 		return ErrSQL
 	}
+	repo.updateCache(ctx, cacheTrack, t.ID, t)
 	return nil
 }
 
 func (repo *TrackRepository) GetByID(ctx context.Context, id uuid.UUID) (models.Track, error) {
-	var res trackForDB
-	err := repo.getExecutor(ctx).Get(ctx, &res, `
+	var (
+		resDB trackForDB
+		res   models.Track
+	)
+	if ok := repo.checkCache(ctx, cacheTrack, id, &res); ok {
+		return res, nil
+	}
+	err := repo.getExecutor(ctx).Get(ctx, &resDB, `
 		SELECT *
 		FROM tracks
 		WHERE id = $1
@@ -150,7 +165,8 @@ func (repo *TrackRepository) GetByID(ctx context.Context, id uuid.UUID) (models.
 			slog.String("where", "TrackRepository.GetByID"))
 		return models.Track{}, fmt.Errorf("TrackRepository.GetByID: %w", ErrSQL)
 	}
-	return convertToModel(res), nil
+	repo.updateCache(ctx, cacheTrack, id, convertToModel(resDB))
+	return convertToModel(resDB), nil
 }
 
 func (repo *TrackRepository) FindCopy(ctx context.Context, a models.Track) (bool, error) {
