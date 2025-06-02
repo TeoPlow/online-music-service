@@ -1,0 +1,25 @@
+# Пример config.yml
+
+log:
+  level: INFO
+  save_to_file: False
+
+paths:
+  base_dir: /path/to/online-music-service/src/analysis
+
+kafka:
+  bootstrap_servers: kafka:9092
+  topics:
+    - auth-users
+    - music-artists
+    - music-albums
+    - music-tracks
+    - music-liked-artists
+    - music-liked-tracks
+
+postgres:
+  host: postgres
+  port: 9000
+  user: default # Не пашет
+  password: "mysecurepassword"
+  database: music_streaming

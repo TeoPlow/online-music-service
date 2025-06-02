@@ -1,0 +1,174 @@
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    - govet              # стандартные проверки от go vet
+    - errcheck           # пропущенные проверки ошибок
+    - staticcheck        # множество анализов кода
+    - gosimple           # упрощение кода
+    - unused             # неиспользуемые переменные, функции и т.д.
+    - typecheck          # типовые ошибки
+    - depguard           # запрет импорта определённых пакетов
+    - gofmt              # стиль форматирования
+    - goimports          # порядок импортов
+    - revive             # лёгкий и гибкий линтер стиля
+    - ineffassign        # неэффективные присваивания
+    - nilerr             # nil вместо ошибки
+    - gocritic           # различные эвристики
+    - misspell           # орфография
+    - copyloopvar
+    - lll
+linters-settings:
+  gofmt:
+    simplify: true
+
+  revive:
+    severity: warning
+    rules:
+      - name: indent-error-flow
+      - name: var-naming
+      - name: package-comments
+      - name: if-return
+      - name: dot-imports
+
+  goimports:
+    local-prefixes: github.com/TeoPlow/online-music-service
+
+  misspell:
+    locale: RU    
+
+  lll:
+    line-length: 120
+    tab-width: 4
+    ignore-strings: true
+    ignore-comments: true
+
+  depguard:
+    rules:
+      main:
+        list-mode: strict
+        files:
+          - "**/cmd/**"
+        allow:
+          - time
+          - os
+          - syscall
+          - context
+          - flag
+          - log
+          - os
+          - sync
+          - os/signal
+          - syscall
+          - github.com/joho/godotenv 
+          - "github.com/TeoPlow/online-music-service"
+      testing:
+        list-mode: strict
+        files:
+          - "**/*_test.go"
+        allow:
+          - $gostd
+          - "github.com/stretchr/testify"
+          - "github.com/golang/mock/gomock"
+          - "github.com/google/uuid"
+          - "google.golang.org/grpc"
+          - "github.com/TeoPlow/online-music-service"
+          - "google.golang.org/protobuf/types/known/emptypb"
+          # for auth
+          - "github.com/golang-jwt/jwt"
+          - "github.com/jackc/pgx"
+          - "golang.org/x/crypto/bcrypt"
+          - "github.com/redis/go-redis"
+      musical-internal:
+        list-mode: strict
+        files:
+          - "**/musical/internal/**"
+          - "!**/*_test.go"
+        allow:
+          # std
+          - $gostd
+          - "github.com/google/uuid"
+          - "gopkg.in/yaml.v3"
+          # for http
+          - "github.com/gorilla/mux"
+          # for grpc
+          - "google.golang.org/grpc"
+          - "google.golang.org/protobuf/types/known"
+          # for postgres
+          - "github.com/jackc"
+          - "github.com/georgysavva/scany/pgxscan"
+          # for minio
+          - "github.com/minio/minio-go/v7"
+          # for kafka
+          - "github.com/IBM/sarama"
+          # internal packages
+          - "github.com/TeoPlow/online-music-service/src/musical/internal"
+          - "github.com/TeoPlow/online-music-service/src/musical/pkg"
+      auth-internal:
+        list-mode: strict
+        files:
+          - "**/auth/internal/**"
+          - "**/auth/**/*.go"
+          - "!**/*_test.go"
+        allow:
+            # std
+            - $gostd
+            - "github.com/google/uuid"
+            - "github.com/golang-jwt/jwt/v5"
+            - "github.com/jackc/pgx/v5"
+            - "github.com/georgysavva/scany/pgxscan"
+            - "time"
+            #env
+            - "github.com/joho/godotenv"
+            - "github.com/ilyakaznacheev/cleanenv"
+            #crypto
+            - "golang.org/x/crypto/bcrypt"
+            # grpc
+            - "google.golang.org/grpc"
+            - "google.golang.org/protobuf/types/known/timestamppb"
+            # redis
+            - "github.com/redis/go-redis/v9"
+            # kafka
+            - "github.com/IBM/sarama"
+            #internal packages
+            - "github.com/TeoPlow/online-music-service/src/auth"
+        
+      other:
+        list-mode: strict
+        files:
+          - $all
+          - "!**/cmd/**"
+          - "!**/musical/**"
+          - "!**/auth/**"
+          - "!**/*_test.go"
+        allow:
+          - $gostd
+    
+
+issues:
+  exclude-use-default: false
+  exclude-dirs:
+    - "mocks"
+  exclude-files:
+    - ".*_mock.go"
+    - "testing/cmd/client/main.go"
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude:
+    - "should have comment or be unexported"  # ослабим комментарии на экспортируемые
+    - "error return value not checked"        # иногда нужно, но часто — шум
+  exclude-rules:
+    - path: "cmd/.*/main.go"
+      linters:
+        - revive
+        - unused
+      
+        - unused
+      
+
+output:
+  formats: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true

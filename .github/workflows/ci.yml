@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  python-lint:
+    name: Python Linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Install Python deps
+        run: make py-deps
+
+      - name: Run flake8
+        run: make py-lint
+
+  go-lint:
+    name: Go Linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.24'
+
+      - name: Tidy modules and install tools
+        run: |
+          go mod tidy
+          make go-deps
+
+      - name: Run golangci-lint
+        run: make go-lint
+    
+  tests:
+    name: All Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+      
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.24'
+
+      - name: Install Docker Compose
+        run: sudo apt-get update && sudo apt-get install -y docker-compose
+          
+      - name: Install dependencies
+        run: make deps
+
+      - name: Run tests
+        run: make test

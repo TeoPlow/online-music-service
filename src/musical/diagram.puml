@@ -1,0 +1,79 @@
+@startuml diagram
+left to right direction
+
+package internal/controllers {
+    class GRPCServer {
+        -trackService
+        -albumService
+        -artistService
+        -likedService
+        -streamingService
+    }
+    class KafkaConsumer {
+        -artistService
+    }
+}
+
+package internal/domain {
+    class TrackService {
+        -albumClient: AlbumService
+        -streamingClient: StreamingService
+        -trackRepo: TrackRepository
+    }
+    class AlbumService {
+        -artistClient: ArtistService
+        -albumRepo: AlbumRepository
+    }
+    class ArtistService {
+        -artistRepo: ArtistRepository
+    }
+    class LikedService {
+        -trackClient: TrackService
+        -artistClient: ArtistService
+        -likedRepo: LikedRepository
+    }
+    class StreamingService {
+        -streamingRepo: StreamingRepository
+    }
+}
+
+package internal/storage {
+    class TrackRepository {
+        -db: Postgres
+        -cache: Redis
+    }
+    class AlbumRepository {
+        -db: Postgres
+        -cache: Redis
+    }
+    class ArtistRepository {
+        -db: Postgres
+        -cache: Redis
+    }
+    class LikedRepository {
+        -db: Postgres
+        -cache: Redis
+    }
+    class FileStorage {
+        -db: MiniO
+    }
+}
+
+"GRPCServer" ====> "internal/domain"
+"KafkaConsumer" ====> "internal/domain"
+
+"TrackService" .> "AlbumService"
+"TrackService" .> "StreamingService"
+"TrackService" --> "TrackRepository"
+
+"AlbumService" .> ArtistService
+"AlbumService" --> "AlbumRepository"
+
+"ArtistService" --> "ArtistRepository"
+
+"LikedService" .> "ArtistService"
+"LikedService" .> "TrackService"
+"LikedService" --> "LikedRepository"
+
+"StreamingService" --> "FileStorage"
+@enduml

@@ -1,0 +1,15 @@
+.venv/
+
+.vscode/
+
+bin/
+logs.json
+logs/
+
+__pycache__/
+
+.pytest*
+
+config.yml
+config.test.yml
+.env

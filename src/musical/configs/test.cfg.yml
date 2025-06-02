@@ -1,0 +1,11 @@
+dbconnection: "postgresql://test:test@localhost:5432/test-musical?sslmode=disable"
+
+log:
+  level: debug
+  file: logs.json
+
+minio:
+  endpoint: "localhost:9000"
+  access: "minioadmin"
+  secret: "minioadmin123"
+  ssl: false
